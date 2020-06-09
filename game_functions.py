@@ -29,7 +29,7 @@ def update_game(screen, settings, player, display_box, objects, character):
 	player.update_position()
 	#Update all NPCs
 	character.movement()
-	#Update the screen visuals every other loop
+	#Update the screen visuals every 10 loops
 	settings.loop_count += 1
 	if settings.loop_count % 10 == 1:
 		#Draw player to screen

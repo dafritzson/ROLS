@@ -64,14 +64,12 @@ def mouse_click(screen, settings, player, menu, mouse_x, mouse_y):
 		button_clicked = menu.newgame_rect.collidepoint(mouse_x, mouse_y)
 		if button_clicked:
 			settings.game_state = "run"
-			print("hello")
 			#hide the mouse
 			pygame.mouse.set_visible(False)
 	if settings.game_state == "game menu":
 		button_clicked = menu.continuegame_rect.collidepoint(mouse_x, mouse_y)
 		if button_clicked:
 			settings.game_state = "run"
-			print("hi")
 			#hide the mouse
 			pygame.mouse.set_visible(False)
 

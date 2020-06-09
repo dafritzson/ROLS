@@ -23,6 +23,7 @@ from display_box import DisplayBox
 #from object import Object
 from level_map import LevelMap
 from barrier import Barrier, Object
+import obstacle as obstacle
 
 def run_game():
 	pygame.init()
@@ -44,6 +45,8 @@ def run_game():
 
 	player = Player(screen, settings, display_box, collisions)
 	girl = Character(screen, settings, display_box)
+	# New method using the new obstacles. Also, why is display_box passed as an arg to Character()?
+	# girl = obstacle.GirlNPC(screen, settings, x, y)
 	NPCs.add(girl)
 
 	#Add all groups the player can collide with

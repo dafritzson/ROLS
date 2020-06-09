@@ -14,6 +14,7 @@ class Character(Sprite):
 		self.moving_left = False
 		self.moving_up = False
 		self.moving_down = False
+		self.colliding = False
 
 		#Load player image surface and define rectangle
 		self.image = pygame.image.load('.\\Images\\Character\\the_girl.png')
@@ -29,11 +30,8 @@ class Character(Sprite):
 	def movement(self):
 
 		if self.moving_right:
-			print("hi")
 			if self.rect.x < 700:
-				print("hi")
 				self.x += self.settings.character_speed
-				print(self.rect.x)
 			else:
 				self.moving_right = False
 				self.moving_down = True
