@@ -23,7 +23,7 @@ from display_box import DisplayBox
 #from object import Object
 from level_map import LevelMap
 from barrier import Barrier, Object
-import obstacle as obstacle
+from obstacle import GirlNPC
 
 def run_game():
 	pygame.init()
