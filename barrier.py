@@ -28,7 +28,7 @@ class Object(Barrier):
 
 		#Load Image
 		self.image = pygame.image.load('.\\Images\\Objects\\desk.png')
-		self.image = pygame.transform.scale(self.image, (110, 80))
+		self.image = pygame.transform.scale(self.image, (65, 50))
 		self.rect = self.image.get_rect()
 		self.screen_rect = self.screen.get_rect()
 

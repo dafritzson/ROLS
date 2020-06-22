@@ -1,9 +1,9 @@
 import pygame
 
 class LevelMap():
-	def __init__(self, screen, settings):
+	def __init__(self, settings, screen):
 		self.screen = screen
-		self.screen_rect = self.screen.get_rect()
+		self.screen_rect = self.screen.rect
 		self.settings = settings
 
 		self.image=pygame.image.load('.\\Images\\Map\\test_map.png')
@@ -14,4 +14,4 @@ class LevelMap():
 		self.rect.centery = self.screen_rect.centery 
 
 	def blitme(self):
-		self.screen.blit(self.image, self.rect)
+		self.screen.display.blit(self.image, self.rect)

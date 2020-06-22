@@ -3,7 +3,7 @@ from pygame.sprite import Sprite
 
 
 class Player(Sprite):
-	def __init__(self, screen, settings, display_box, collisions):
+	def __init__(self, settings, screen, display_box, collisions):
 		super(Player, self).__init__()
 		self.screen = screen
 		self.settings = settings
@@ -11,50 +11,84 @@ class Player(Sprite):
 		self.collisions = collisions
 
 		#Default Image
-		self.image = pygame.image.load('.\\Images\\Player\\the_guy_l.png')
-		self.image = pygame.transform.scale(self.image, (30, 85))
+		self.image = pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png')
+		self.rect = self.image.get_rect()
+		#self.rect = self.image.get_rect(center = (16,-16))
+		#self.rect = self.rect.inflate(0,-30)
 
-		#Player movement states
+		self.rect.center = self.screen.rect.center
+
+
+		#Player movement data
 		self.move_in_progress = False
+		self.finishing_animation = False
+		self.move_count = 0
+		self.direction = "none"
 		self.moving_right = False
 		self.moving_left = False
 		self.moving_up = False
 		self.moving_down = False
+		self.speed = 3
+		self.animation_count = 0
 
-		#Load player image surface and define rectangle
-		self.image_left = pygame.image.load('.\\Images\\Player\\the_guy_l.png')
-		self.image_right = pygame.image.load('.\\Images\\Player\\the_guy_r.png')
-		self.image_left = pygame.transform.scale(self.image_left, (30, 85))
-		self.image_right = pygame.transform.scale(self.image_right, (30, 85))
-		self.rect = self.image_left.get_rect()
-		self.screen_rect = self.screen.get_rect()
-		self.rect.center = self.screen_rect.center
+		#Load player images
+		self.image_left = [pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),
+		pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left2.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left2.png'),
+		pygame.image.load('.\\Images\\Player\\Walk_Left\\left2.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left3.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left3.png'),
+		pygame.image.load('.\\Images\\Player\\Walk_Left\\left3.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left4.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left4.png'),
+		pygame.image.load('.\\Images\\Player\\Walk_Left\\left4.png')]
+
+		self.image_right = [pygame.image.load('.\\Images\\Player\\Walk_Right\\right1.png'),pygame.image.load('.\\Images\\Player\\Walk_Right\\right1.png'),
+		pygame.image.load('.\\Images\\Player\\Walk_Right\\right1.png'),pygame.image.load('.\\Images\\Player\\Walk_Right\\right2.png'),pygame.image.load('.\\Images\\Player\\Walk_Right\\right2.png'),
+		pygame.image.load('.\\Images\\Player\\Walk_Right\\right2.png'),pygame.image.load('.\\Images\\Player\\Walk_Right\\right3.png'),pygame.image.load('.\\Images\\Player\\Walk_Right\\right3.png'),
+		pygame.image.load('.\\Images\\Player\\Walk_Right\\right3.png'),pygame.image.load('.\\Images\\Player\\Walk_Right\\right4.png'),pygame.image.load('.\\Images\\Player\\Walk_Right\\right4.png'),
+		pygame.image.load('.\\Images\\Player\\Walk_Right\\right4.png')]
+
+		self.image_up = [pygame.image.load('.\\Images\\Player\\Walk_Up\\up1.png'),pygame.image.load('.\\Images\\Player\\Walk_Up\\up1.png'),
+		pygame.image.load('.\\Images\\Player\\Walk_Up\\up1.png'),pygame.image.load('.\\Images\\Player\\Walk_Up\\up2.png'),pygame.image.load('.\\Images\\Player\\Walk_Up\\up2.png'),
+		pygame.image.load('.\\Images\\Player\\Walk_Up\\up2.png'),pygame.image.load('.\\Images\\Player\\Walk_Up\\up3.png'),pygame.image.load('.\\Images\\Player\\Walk_Up\\up3.png'),
+		pygame.image.load('.\\Images\\Player\\Walk_Up\\up3.png'),pygame.image.load('.\\Images\\Player\\Walk_Up\\up4.png'),pygame.image.load('.\\Images\\Player\\Walk_Up\\up4.png'),
+		pygame.image.load('.\\Images\\Player\\Walk_Up\\up4.png')]
+
+		self.image_down = [pygame.image.load('.\\Images\\Player\\Walk_Down\\down1.png'),pygame.image.load('.\\Images\\Player\\Walk_Down\\down1.png'),
+		pygame.image.load('.\\Images\\Player\\Walk_Down\\down1.png'),pygame.image.load('.\\Images\\Player\\Walk_Down\\down2.png'),pygame.image.load('.\\Images\\Player\\Walk_Down\\down2.png'),
+		pygame.image.load('.\\Images\\Player\\Walk_Down\\down2.png'),pygame.image.load('.\\Images\\Player\\Walk_Down\\down3.png'),pygame.image.load('.\\Images\\Player\\Walk_Down\\down3.png'),
+		pygame.image.load('.\\Images\\Player\\Walk_Down\\down3.png'),pygame.image.load('.\\Images\\Player\\Walk_Down\\down4.png'),pygame.image.load('.\\Images\\Player\\Walk_Down\\down4.png'),
+		pygame.image.load('.\\Images\\Player\\Walk_Down\\down4.png')]
+
 
 		#Player exact positions
 		self.x = float(self.rect.x)
 		self.y = float(self.rect.y)
 
+	def move_right(self):
+		self.x = self.x + self.speed
+		self.image = self.image_right[self.animation_count % 12]
+		self.animation_count += 1
+		self.direction = "right"
 
-	def update_position(self):
-		'''Update character movement. Character can only move in one direction'''
-		#self.move_animating = True
-		if self.moving_right and self.rect.right < self.screen_rect.right:
-			self.x = self.x + self.settings.character_speed
-			self.direction = "right"
-		elif self.moving_left and self.rect.left > self.screen_rect.left:
-			self.x = self.x - self.settings.character_speed
-			self.direction = "left"
-		elif self.moving_up and self.rect.top > self.screen_rect.top:
-			self.y = self.y - self.settings.character_speed
-			self.direction = "up"
-		elif self.moving_down and self.rect.bottom < self.display_box.box_rect.top:
-			self.y = self.y + self.settings.character_speed
-			self.direction="down"
+	def move_left(self):
+		self.x = self.x - self.speed
+		self.image = self.image_left[self.animation_count % 12]
+		self.animation_count += 1
+		self.direction = "left"
+
+	def move_up(self):
+		self.y = self.y - self.speed
+		self.image = self.image_up[self.animation_count % 12]
+		self.animation_count += 1
+		self.direction = "up"
+
+	def move_down(self):
+		self.y = self.y + self.speed
+		self.image = self.image_down[self.animation_count % 12]
+		self.animation_count += 1
+		self.direction = "down"
+
+	def check_collision(self):
 		#If player collides with an object rectangle, stop the player from moving in that direction
 		if  pygame.sprite.spritecollide(self, self.collisions, False):
 			self.move_back()
-		self.rect.x = int(self.x)
-		self.rect.y = int(self.y)
 
 	def move_back(self):
 		if self.direction =="right":
@@ -68,6 +102,8 @@ class Player(Sprite):
 
 
 	def blitme(self):
-		self.screen.blit(self.image, self.rect)
+		self.rect.x = int(self.x)
+		self.rect.y = int(self.y)
+		self.screen.display.blit(self.image, self.rect)
 
 
