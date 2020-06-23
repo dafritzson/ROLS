@@ -26,27 +26,28 @@ from obstacle import Desk, Wall, GirlNPC
 def run_game():
 	pygame.init()
 	clock = pygame.time.Clock()
-	
 	settings = Settings()
 	#screen = pygame.display.set_mode(size=(settings.screen_width, settings.screen_height))
 	screen = Screen(settings)
 	pygame.display.set_caption("Real Office Life Simulator")
 	display_box = DisplayBox(settings, screen)
+	static_objects = Group()
 	obstacles = Group()
 	collisions = Group()
 
+
 	#Build map and objects
-	gf.generate_obstacles(settings, screen, obstacles)
+	gf.generate_obstacles(settings, screen, static_objects, obstacles)
 	level_map = LevelMap(settings, screen)
 	gf.update_screen(settings, screen, display_box, level_map)
-	gf.build_map(settings, screen, obstacles)
-
-	player = Player(settings, screen, display_box, collisions)
-	girl = GirlNPC(settings, screen, 500, 100)
-	obstacles.add(girl)
+	gf.build_map(settings, screen, level_map, static_objects, obstacles)
 
 	#Add all groups the player can collide with
 	collisions.add(obstacles)
+
+	player = Player(settings, screen, level_map, display_box, collisions, static_objects)
+	girl = GirlNPC(settings, screen, 500, 100)
+	obstacles.add(girl)
 
 	main_menu = MainMenu(settings, screen, player)
 	game_menu = GameMenu(settings, screen, player)
@@ -54,9 +55,6 @@ def run_game():
 	
 	#Run main game loop
 	while True:
-		#event_type = pygame.event.get()
-		#if event_type != []:
-		#	print (event_type)
 		clock.tick_busy_loop(30)
 		#State Machine
 		if settings.game_state == "main menu":
@@ -67,8 +65,8 @@ def run_game():
 		elif settings.game_state == "run":	
 			event.event_loop(settings, screen, player, main_menu)
 			gf.update_screen(settings, screen, display_box, level_map)
-			gf.update_game(settings, screen, player, display_box, obstacles)
-			gf.update_player(settings, screen, player, display_box)
+			gf.update_game(settings, screen, player, level_map, display_box, obstacles)
+			gf.update_player(settings, screen, player, level_map, display_box)
 			#print(pygame.key.get_repeat())
 			
 		elif settings.game_state == "game menu":

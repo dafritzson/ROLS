@@ -3,12 +3,14 @@ from pygame.sprite import Sprite
 
 
 class Player(Sprite):
-	def __init__(self, settings, screen, display_box, collisions):
+	def __init__(self, settings, screen, level_map, display_box, collisions, static_objects):
 		super(Player, self).__init__()
 		self.screen = screen
 		self.settings = settings
+		self.level_map = level_map
 		self.display_box = display_box
 		self.collisions = collisions
+		self.static_objects = static_objects
 
 		#Default Image
 		self.image = pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png')
@@ -17,7 +19,6 @@ class Player(Sprite):
 		#self.rect = self.rect.inflate(0,-30)
 
 		self.rect.center = self.screen.rect.center
-
 
 		#Player movement data
 		self.move_in_progress = False
@@ -61,6 +62,7 @@ class Player(Sprite):
 		self.x = float(self.rect.x)
 		self.y = float(self.rect.y)
 
+#Functions to move the player in different directions with corresponding animation
 	def move_right(self):
 		self.x = self.x + self.speed
 		self.image = self.image_right[self.animation_count % 12]
@@ -81,6 +83,27 @@ class Player(Sprite):
 
 	def move_down(self):
 		self.y = self.y + self.speed
+		self.image = self.image_down[self.animation_count % 12]
+		self.animation_count += 1
+		self.direction = "down"
+
+#Functions for animating the player without changing their position
+	def animate_right(self):
+		self.image = self.image_right[self.animation_count % 12]
+		self.animation_count += 1
+		self.direction = "right"
+
+	def animate_left(self):
+		self.image = self.image_left[self.animation_count % 12]
+		self.animation_count += 1
+		self.direction = "left"
+
+	def animate_up(self):
+		self.image = self.image_up[self.animation_count % 12]
+		self.animation_count += 1
+		self.direction = "up"
+
+	def animate_down(self):
 		self.image = self.image_down[self.animation_count % 12]
 		self.animation_count += 1
 		self.direction = "down"
@@ -107,3 +130,23 @@ class Player(Sprite):
 		self.screen.display.blit(self.image, self.rect)
 
 
+#Functions to move the level_map and objects as defined by the players position
+	def move_map_right(self):
+		self.level_map.rect.centerx -= self.speed
+		for obj in self.static_objects:
+			obj.rect.centerx -=self.speed
+
+	def move_map_left(self):
+		self.level_map.rect.centerx += self.speed
+		for obj in self.static_objects:
+			obj.rect.centerx +=self.speed
+
+	def move_map_up(self):
+		self.level_map.rect.centery += self.speed
+		for obj in self.static_objects:
+			obj.rect.centery += self.speed
+
+	def move_map_down(self):
+		self.level_map.rect.centery -= self.speed
+		for obj in self.static_objects:
+			obj.rect.centery -=self.speed
