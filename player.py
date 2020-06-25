@@ -3,14 +3,14 @@ from pygame.sprite import Sprite
 
 
 class Player(Sprite):
-	def __init__(self, settings, screen, level_map, display_box, collisions, static_objects):
+	def __init__(self, settings, screen, level_map, display_box, collisions, obstacles):
 		super(Player, self).__init__()
 		self.screen = screen
 		self.settings = settings
 		self.level_map = level_map
 		self.display_box = display_box
 		self.collisions = collisions
-		self.static_objects = static_objects
+		self.obstacles = obstacles
 
 		#Default Image
 		self.image = pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png')
@@ -124,29 +124,35 @@ class Player(Sprite):
 			self.y = self.y - self.settings.character_speed
 
 
-	def blitme(self):
-		self.rect.x = int(self.x)
-		self.rect.y = int(self.y)
-		self.screen.display.blit(self.image, self.rect)
+	
 
 
 #Functions to move the level_map and objects as defined by the players position
 	def move_map_right(self):
 		self.level_map.rect.centerx -= self.speed
-		for obj in self.static_objects:
-			obj.rect.centerx -=self.speed
+		for obst in self.obstacles:
+			obst.rect.x -= self.speed
+			print(obst.rect.centerx)
 
 	def move_map_left(self):
 		self.level_map.rect.centerx += self.speed
-		for obj in self.static_objects:
-			obj.rect.centerx +=self.speed
+		for obst in self.obstacles:
+			obst.rect.x += self.speed
+			print(obst.rect.centerx)
+
 
 	def move_map_up(self):
 		self.level_map.rect.centery += self.speed
-		for obj in self.static_objects:
-			obj.rect.centery += self.speed
+		for obst in self.obstacles:
+			obst.rect.y += self.speed
 
 	def move_map_down(self):
 		self.level_map.rect.centery -= self.speed
-		for obj in self.static_objects:
-			obj.rect.centery -=self.speed
+		for obst in self.obstacles:
+			obst.rect.y -= self.speed
+
+	def blitme(self):
+		self.rect.x = int(self.x)
+		self.rect.y = int(self.y)
+		#self.level_map.image.blit(self.image, self.rect)
+		self.screen.display.blit(self.image, self.rect)

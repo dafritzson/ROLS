@@ -13,16 +13,16 @@ class Menu():
 		self.height = 300
 		self.color = (255, 255, 255)
 
-		self.menu_left = self.screen.rect.centerx - self.width/2
-		self.menu_top = self.screen.rect.centery - self.height/2
+		self.left = self.screen.rect.centerx - self.width/2
+		self.top = self.screen.rect.centery - self.height/2
 
 		#Load menu
-		self.menu_rect = pygame.Rect(self.menu_left, self.menu_top, self.width, self.height)
+		self.rect = pygame.Rect(self.left, self.top, self.width, self.height)
 
 
 	def blitme(self):
 		'''draw the menu rectangles to the screen'''
-		pygame.draw.rect(self.screen, self.color, self.menu_rect)
+		pygame.draw.rect(self.screen, self.color, self.rect)
 
 
 class MainMenu(Menu):
@@ -45,7 +45,7 @@ class MainMenu(Menu):
 
 	def blitme(self):
 		'''draw the menu rectangles to the screen'''
-		pygame.draw.rect(self.screen.display, (255, 255, 255), self.menu_rect)
+		pygame.draw.rect(self.screen.display, (255, 255, 255), self.rect)
 		self.screen.display.blit(self.newgame_image, self.newgame_rect)
 		self.screen.display.blit(self.continuegame_image, self.continuegame_rect)
 
@@ -54,8 +54,8 @@ class GameMenu(Menu):
 	def __init__(self, settings, screen, player):
 		super().__init__(settings, screen, player)
 
-		self.menu_left = self.screen.rect.centerx - self.width/2
-		self.menu_top = self.screen.rect.centery - self.height/2
+		self.left = self.screen.rect.centerx - self.width/2
+		self.top = self.screen.rect.centery - self.height/2
 
 		#Define the main menu rectangles
 		self.newgame_image = pygame.image.load('.\\Images\\Menu\\New Game.png')
@@ -72,6 +72,6 @@ class GameMenu(Menu):
 
 	def blitme(self):
 		'''draw the menu rectangles to the screen'''
-		pygame.draw.rect(self.screen, (255, 255, 255), self.menu_rect)
-		self.screen.dsiplay.blit(self.newgame_image, self.newgame_rect)
-		self.screen.dispaly.blit(self.continuegame_image, self.continuegame_rect)
+		pygame.draw.rect(self.screen.display, (255, 255, 255), self.rect)
+		self.screen.display.blit(self.newgame_image, self.newgame_rect)
+		self.screen.display.blit(self.continuegame_image, self.continuegame_rect)

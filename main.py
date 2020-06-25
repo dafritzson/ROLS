@@ -31,48 +31,60 @@ def run_game():
 	screen = Screen(settings)
 	pygame.display.set_caption("Real Office Life Simulator")
 	display_box = DisplayBox(settings, screen)
-	static_objects = Group()
 	obstacles = Group()
 	collisions = Group()
 
 
 	#Build map and objects
-	gf.generate_obstacles(settings, screen, static_objects, obstacles)
 	level_map = LevelMap(settings, screen)
+	gf.generate_obstacles(settings, screen, level_map, obstacles)
 	gf.update_screen(settings, screen, display_box, level_map)
-	gf.build_map(settings, screen, level_map, static_objects, obstacles)
+	gf.build_map(settings, screen, level_map, obstacles)
 
 	#Add all groups the player can collide with
 	collisions.add(obstacles)
 
-	player = Player(settings, screen, level_map, display_box, collisions, static_objects)
-	girl = GirlNPC(settings, screen, 500, 100)
+	player = Player(settings, screen, level_map, display_box, collisions, obstacles)
+	girl = GirlNPC(settings, screen, level_map, 500, 100)
 	obstacles.add(girl)
 
 	main_menu = MainMenu(settings, screen, player)
 	game_menu = GameMenu(settings, screen, player)
 
-	
+	image = pygame.image.load('.\\Images\\Map\\cubicle_wall.png')
+	rect = image.get_rect()
+	rect.midleft = screen.rect.midleft
+	screen.display.blit(image, rect)
+	for y in range(0, rect.height):
+		for x in range(0, rect.width):
+			tile_key1 = image.get_at((x, y))
+			print(tile_key1)
+
 	#Run main game loop
 	while True:
 		clock.tick_busy_loop(30)
+		gf.update_screen(settings, screen, display_box, level_map)
+		
 		#State Machine
 		if settings.game_state == "main menu":
 			event.event_loop(settings, screen, player, main_menu)
-			gf.update_screen(settings, screen, display_box, level_map)
-			gf.run_main_menu(settings, screen, player, main_menu)
+			gf.run_menu(settings, screen, player, main_menu)
+
+
+
+		elif settings.game_state == "game menu":
+			event.event_loop(settings, screen, player, game_menu)
+			gf.run_menu(settings, screen, player, game_menu)
 
 		elif settings.game_state == "run":	
 			event.event_loop(settings, screen, player, main_menu)
-			gf.update_screen(settings, screen, display_box, level_map)
-			gf.update_game(settings, screen, player, level_map, display_box, obstacles)
-			gf.update_player(settings, screen, player, level_map, display_box)
-			#print(pygame.key.get_repeat())
+			gf.update_game(settings, obstacles)
+			gf.update_player(settings, screen, player, display_box)
+			gf.draw_display(settings, screen, player, level_map, display_box, obstacles)
 			
-		elif settings.game_state == "game menu":
-			event.event_loop(settings, screen, player, game_menu)
-			gf.update_screen(settings, screen, display_box, level_map)
-			gf.run_game_menu(settings, screen, player, game_menu)
+
+
+		gf.update_display()
 run_game()
 
 

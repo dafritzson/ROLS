@@ -6,40 +6,24 @@ import images
 from obstacle import Desk, Wall, GirlNPC
 
 
-def update_screen(settings, screen, display_box, level_map):
-	'''Redraw the screen during each pass through the loop to prep for next frame of game image'''
-	screen.fill()
-	#Draw map
-	level_map.blitme()
-
-def run_main_menu(settings, screen, player, menu):
-	'''run the main menu state'''
-	menu.blitme()
-	# make the most recently drawn screen visible
-	pygame.display.update()
-
-def run_game_menu(settings, screen, player, menu):
-	'''run the in game menu state'''
-	menu.blitme()
-	# make the most recently drawn screen visible
-	pygame.display.update()
-
-def update_game(settings, screen, player, level_map, display_box, obstacles):
-	#Draw player to screen
-	player.blitme()
-	#Draw display box
-	display_box.blitme()
-	#Draw obstacles
-	for obstacle in obstacles:
-		obstacle.update()
-		obstacle.blitme()
-	
-	#update_map(settings, screen, level_map, display_box, player)
-
+def update_display():
 	# make the most recently drawn screen visible			
 	pygame.display.update()	
 
-def update_player(settings, screen, player, level_map, display_box):
+def run_menu(settings, screen, player, menu):
+	'''run the main menu state'''
+	menu.blitme()
+
+def update_screen(settings, screen, display_box, level_map):
+	'''Redraw the screen during each pass through the loop to prep for next frame of game image'''
+	screen.fill()
+
+def update_game(settings, obstacles):
+	#Draw obstacles
+	for obstacle in obstacles:
+		obstacle.update()
+
+def update_player(settings, screen, player, display_box):
 	player.check_collision()
 	#standard player movement to respond to player movement flags set in the event loop
 	if player.move_in_progress:
@@ -84,36 +68,38 @@ def update_player(settings, screen, player, level_map, display_box):
 		else:
 			player.finishing_animation = False
 
-def update_map(settings, screen, level_map, display_box, player):
-	if player.move_in_progress or player.finishing_animation:
-		if player.direction == "right" and player.rect.x > screen.rect.centerx + screen.rect.width / 3:
-			level_map.move_map_right()
-		if player.direction == "left" and player.rect.x < screen.rect.centerx - screen.rect.width / 3:
-			level_map.move_map_left()
-		if player.direction == "up" and player.rect.y > screen.rect.height / 3:
-			level_map.move_map_up()
-		if player.direction == "down" and player.rect.y < 2* screen.rect.height / 3:
-			level_map.move_map_down()
+def draw_display(settings, screen, player, level_map, display_box, obstacles):
+	screen.fill()
+	level_map.blitme()
+	display_box.blitme()
+	player.blitme()
+	for obstacle in obstacles:
+		obstacle.blitme()
 
-
-def generate_obstacles(settings, screen, static_objects, obstacles):
-	new_desk = Desk(settings, screen, 200, 200)
+def generate_obstacles(settings, screen, level_map, obstacles):
+	new_desk = Desk(settings, screen, level_map, 200, 200)
 	obstacles.add(new_desk)
-	static_objects.add(new_desk)
-	new_desk = Desk(settings, screen, 500, 250)
+	new_desk = Desk(settings, screen, level_map, 500, 250)
 	obstacles.add(new_desk)
-	static_objects.add(new_desk)
 
 
-def build_map(settings, screen, level_map, static_objects, obstacles):
-	print(level_map.rect.height)
-	print(level_map.rect.width)
+def build_map(settings, screen, level_map, obstacles):
+	#For the given map recognize obstacles within the map image and add a obstacle object at its x and y location
 	for y in range(0, level_map.rect.height, settings.tile_size):
 		for x in range(0, level_map.rect.width, settings.tile_size):
-			tile_key = level_map.image.get_at((x, y))
+			tile_key1 = level_map.image.get_at((x, y))
+			tile_key2 = level_map.image.get_at((x+1, y))
+			tile_key3 = level_map.image.get_at((x+2, y))
+			tile_key4 = level_map.image.get_at((x, y+1))
+			tile_key5 = level_map.image.get_at((x+1, y+1))
+			tile_key6 = level_map.image.get_at((x+2, y+1))
+			tile_key7 = level_map.image.get_at((x, y+3))
+			tile_key8 = level_map.image.get_at((x+1, y+3))
+			tile_key8 = level_map.image.get_at((x+2, y+3))
+
 			for tile in images.barrier_tiles:
-				if tile_key == tile:
-					wall = Wall(settings, screen, x, y)
+				if tile_key1 == tile and tile_key2 == tile:
+					wall = Wall(settings, screen, level_map, x, y)
 					obstacles.add(wall)
-					static_objects.add(wall)
+
 
