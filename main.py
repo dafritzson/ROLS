@@ -47,6 +47,7 @@ def run_game():
 	player = Player(settings, screen, level_map, display_box, collisions, obstacles)
 	girl = GirlNPC(settings, screen, level_map, 500, 100)
 	obstacles.add(girl)
+	collisions.add(girl)
 
 	main_menu = MainMenu(settings, screen, player)
 	game_menu = GameMenu(settings, screen, player)
@@ -64,13 +65,11 @@ def run_game():
 	while True:
 		clock.tick_busy_loop(30)
 		gf.update_screen(settings, screen, display_box, level_map)
-		
+
 		#State Machine
 		if settings.game_state == "main menu":
 			event.event_loop(settings, screen, player, main_menu)
 			gf.run_menu(settings, screen, player, main_menu)
-
-
 
 		elif settings.game_state == "game menu":
 			event.event_loop(settings, screen, player, game_menu)
@@ -81,10 +80,9 @@ def run_game():
 			gf.update_game(settings, obstacles)
 			gf.update_player(settings, screen, player, display_box)
 			gf.draw_display(settings, screen, player, level_map, display_box, obstacles)
-			
-
 
 		gf.update_display()
+
 run_game()
 
 

@@ -123,10 +123,6 @@ class Player(Sprite):
 		elif self.direction == "down":
 			self.y = self.y - self.settings.character_speed
 
-
-	
-
-
 #Functions to move the level_map and objects as defined by the players position
 	def move_map_right(self):
 		self.level_map.rect.centerx -= self.speed
