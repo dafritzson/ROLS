@@ -43,26 +43,16 @@ def run_game():
 	#set map to background only:
 	level_map.image = pygame.image.load('.\\Images\\Map\\test_map_background.png')
 
-
-	#Add all groups the player can collide with
-	collisions.add(obstacles)
-
-	player = Player(settings, screen, level_map, display_box, collisions, obstacles)
-	girl = GirlNPC(settings, screen, level_map, 500, 100)
+	player = Player(settings, screen, level_map, 300, 250, collisions, display_box, obstacles)
+	girl = GirlNPC(settings, screen, level_map, 500, 100, collisions)
 	obstacles.add(girl)
-	collisions.add(girl)
+
+	#Add all groups that can collide with
+	collisions.add(obstacles)
+	collisions.add(player)
 
 	main_menu = MainMenu(settings, screen, player)
 	game_menu = GameMenu(settings, screen, player)
-
-	image = pygame.image.load('.\\Images\\Map\\cubicle_wall.png')
-	rect = image.get_rect()
-	rect.midleft = screen.rect.midleft
-	screen.display.blit(image, rect)
-	for y in range(0, rect.height):
-		for x in range(0, rect.width):
-			tile_key1 = image.get_at((x, y))
-			print(tile_key1)
 
 	#Run main game loop
 	while True:

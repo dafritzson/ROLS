@@ -1,36 +1,21 @@
 import pygame
 from pygame.sprite import Sprite
+from obstacle import DynamicObstacle
 
 
-class Player(Sprite):
-	def __init__(self, settings, screen, level_map, display_box, collisions, obstacles):
-		super(Player, self).__init__()
-		self.screen = screen
-		self.settings = settings
-		self.level_map = level_map
+class Player(DynamicObstacle):
+	def __init__(self, settings, screen, level_map, x, y, collisions, display_box, obstacles):
+		super(Player, self).__init__(settings, screen, level_map, x, y, collisions,)
 		self.display_box = display_box
-		self.collisions = collisions
 		self.obstacles = obstacles
 
 		#Default Image
 		self.image = pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png')
 		self.rect = self.image.get_rect()
-		#self.rect = self.image.get_rect(center = (16,-16))
-		#self.rect = self.rect.inflate(0,-30)
-
 		self.rect.center = self.screen.rect.center
 
-		#Player movement data
-		self.move_in_progress = False
+		#Player specific movement states
 		self.finishing_animation = False
-		self.move_count = 0
-		self.direction = "none"
-		self.moving_right = False
-		self.moving_left = False
-		self.moving_up = False
-		self.moving_down = False
-		self.speed = 3
-		self.animation_count = 0
 
 		#Load player images
 		self.image_left = [pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),
@@ -58,35 +43,6 @@ class Player(Sprite):
 		pygame.image.load('.\\Images\\Player\\Walk_Down\\down4.png')]
 
 
-		#Player exact positions
-		self.x = float(self.rect.x)
-		self.y = float(self.rect.y)
-
-#Functions to move the player in different directions with corresponding animation
-	def move_right(self):
-		self.x = self.x + self.speed
-		self.image = self.image_right[self.animation_count % 12]
-		self.animation_count += 1
-		self.direction = "right"
-
-	def move_left(self):
-		self.x = self.x - self.speed
-		self.image = self.image_left[self.animation_count % 12]
-		self.animation_count += 1
-		self.direction = "left"
-
-	def move_up(self):
-		self.y = self.y - self.speed
-		self.image = self.image_up[self.animation_count % 12]
-		self.animation_count += 1
-		self.direction = "up"
-
-	def move_down(self):
-		self.y = self.y + self.speed
-		self.image = self.image_down[self.animation_count % 12]
-		self.animation_count += 1
-		self.direction = "down"
-
 #Functions for animating the player without changing their position
 	def animate_right(self):
 		self.image = self.image_right[self.animation_count % 12]
@@ -108,47 +64,26 @@ class Player(Sprite):
 		self.animation_count += 1
 		self.direction = "down"
 
-	def check_collision(self):
-		#If player collides with an object rectangle, stop the player from moving in that direction
-		if  pygame.sprite.spritecollide(self, self.collisions, False):
-			self.move_back()
-
-	def move_back(self):
-		if self.direction =="right":
-			self.x = self.x - self.settings.character_speed
-		elif self.direction == "left":
-			self.x = self.x + self.settings.character_speed
-		elif self.direction == "up":
-			self.y = self.y + self.settings.character_speed
-		elif self.direction == "down":
-			self.y = self.y - self.settings.character_speed
-
 #Functions to move the level_map and objects as defined by the players position
 	def move_map_right(self):
 		self.level_map.rect.centerx -= self.speed
 		for obst in self.obstacles:
-			obst.rect.x -= self.speed
-			print(obst.rect.centerx)
+			obst.x -= self.speed
 
 	def move_map_left(self):
 		self.level_map.rect.centerx += self.speed
 		for obst in self.obstacles:
-			obst.rect.x += self.speed
-			print(obst.rect.centerx)
-
+			obst.x += self.speed
+			print(obst)
 
 	def move_map_up(self):
 		self.level_map.rect.centery += self.speed
 		for obst in self.obstacles:
-			obst.rect.y += self.speed
+			obst.y += self.speed
 
 	def move_map_down(self):
 		self.level_map.rect.centery -= self.speed
+		self.count=1
 		for obst in self.obstacles:
-			obst.rect.y -= self.speed
+			obst.y -= self.speed
 
-	def blitme(self):
-		self.rect.x = int(self.x)
-		self.rect.y = int(self.y)
-		#self.level_map.image.blit(self.image, self.rect)
-		self.screen.display.blit(self.image, self.rect)

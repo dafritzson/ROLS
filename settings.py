@@ -6,7 +6,6 @@ class Settings():
 
 		self.bg_color = (3,181,133)
 		self.tile_size = 16
-		self.character_speed = 3
 
 		#Game Style
 		self.text_color = (4,5,8)

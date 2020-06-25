@@ -22,9 +22,10 @@ def update_game(settings, obstacles):
 	#Draw obstacles
 	for obstacle in obstacles:
 		obstacle.update()
+		
 
 def update_player(settings, screen, player, display_box):
-	player.check_collision()
+	player.check_collisions()
 	#standard player movement to respond to player movement flags set in the event loop
 	if player.move_in_progress:
 		if player.moving_right and player.rect.right < screen.rect.right:
@@ -54,7 +55,6 @@ def update_player(settings, screen, player, display_box):
 
 	#Finish the animation for all movements. Only run after a keyup ends the player movement.
 	if player.finishing_animation and not player.move_in_progress:
-		#player.check_collision()
 		if (player.direction == "right" or player.direction == "left") and player.rect.x % 8 != 0:
 			if player.direction == "right":
 				player.move_right()
@@ -67,6 +67,7 @@ def update_player(settings, screen, player, display_box):
 				player.move_down()
 		else:
 			player.finishing_animation = False
+
 
 def draw_display(settings, screen, player, level_map, display_box, obstacles):
 	screen.fill()
@@ -88,14 +89,14 @@ def build_map(settings, screen, level_map, obstacles):
 	for y in range(0, level_map.rect.height, settings.tile_size):
 		for x in range(0, level_map.rect.width, settings.tile_size):
 			tile_key1 = level_map.image.get_at((x, y))
-			tile_key2 = level_map.image.get_at((x+1, y))
-			tile_key3 = level_map.image.get_at((x+2, y))
-			tile_key4 = level_map.image.get_at((x, y+1))
-			tile_key5 = level_map.image.get_at((x+1, y+1))
-			tile_key6 = level_map.image.get_at((x+2, y+1))
-			tile_key7 = level_map.image.get_at((x, y+3))
-			tile_key8 = level_map.image.get_at((x+1, y+3))
-			tile_key8 = level_map.image.get_at((x+2, y+3))
+			#tile_key2 = level_map.image.get_at((x+1, y))
+			#tile_key3 = level_map.image.get_at((x+2, y))
+			#tile_key4 = level_map.image.get_at((x, y+1))
+			#tile_key5 = level_map.image.get_at((x+1, y+1))
+			#tile_key6 = level_map.image.get_at((x+2, y+1))
+			#tile_key7 = level_map.image.get_at((x, y+3))
+			#tile_key8 = level_map.image.get_at((x+1, y+3))
+			#tile_key8 = level_map.image.get_at((x+2, y+3))
 
 			for tile in images.barrier_tiles:
 				if tile_key1 == tile:
