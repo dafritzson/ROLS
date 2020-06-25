@@ -40,6 +40,9 @@ def run_game():
 	gf.generate_obstacles(settings, screen, level_map, obstacles)
 	gf.update_screen(settings, screen, display_box, level_map)
 	gf.build_map(settings, screen, level_map, obstacles)
+	#set map to background only:
+	level_map.image = pygame.image.load('.\\Images\\Map\\test_map_background.png')
+
 
 	#Add all groups the player can collide with
 	collisions.add(obstacles)

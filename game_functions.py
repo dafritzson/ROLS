@@ -71,10 +71,10 @@ def update_player(settings, screen, player, display_box):
 def draw_display(settings, screen, player, level_map, display_box, obstacles):
 	screen.fill()
 	level_map.blitme()
-	display_box.blitme()
 	player.blitme()
 	for obstacle in obstacles:
 		obstacle.blitme()
+	display_box.blitme()
 
 def generate_obstacles(settings, screen, level_map, obstacles):
 	new_desk = Desk(settings, screen, level_map, 200, 200)
@@ -98,7 +98,7 @@ def build_map(settings, screen, level_map, obstacles):
 			tile_key8 = level_map.image.get_at((x+2, y+3))
 
 			for tile in images.barrier_tiles:
-				if tile_key1 == tile and tile_key2 == tile:
+				if tile_key1 == tile:
 					wall = Wall(settings, screen, level_map, x, y)
 					obstacles.add(wall)
 

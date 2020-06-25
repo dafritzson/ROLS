@@ -3,8 +3,8 @@ import pygame
 class Screen():
 	'''A class for all attributes and fucntions related to the game screen'''
 	def __init__(self, settings):
-		self.width =  850
-		self.height = 520
+		self.width =  688
+		self.height = 432
 		self.settings = settings
 		self.display = pygame.display.set_mode(size=(self.width, self.height))
 		self.rect = self.display.get_rect()
