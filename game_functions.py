@@ -35,7 +35,7 @@ def update_game(settings, obstacles, player, collisions):
 		
 
 def update_player(settings, screen, player, display_box):
-	player.check_collisions()
+	collided = player.check_collisions()
 	#standard player movement to respond to player movement flags set in the event loop
 	if player.move_in_progress:
 		if player.moving_right and player.rect.right < screen.rect.right:
@@ -64,7 +64,7 @@ def update_player(settings, screen, player, display_box):
 				player.move_down()
 
 	#Finish the animation for all movements. Only run after a keyup ends the player movement.
-	if player.finishing_animation and not player.move_in_progress:
+	if player.finishing_animation and not player.move_in_progress and not collided:
 		if (player.direction == "right" or player.direction == "left") and player.rect.x % 8 != 0:
 			if player.direction == "right":
 				player.move_right()
@@ -77,6 +77,8 @@ def update_player(settings, screen, player, display_box):
 				player.move_down()
 		else:
 			player.finishing_animation = False
+	
+	if collided: player.finishing_animation = False
 
 
 def draw_display(settings, screen, player, level_map, display_box, obstacles):

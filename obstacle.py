@@ -105,10 +105,14 @@ class DynamicObstacle(Obstacle):
 
 	def check_collisions(self):
 		#If player collides with an object rectangle, stop the player from moving in that direction
+		collided = False
 		self.collisions.remove(self)
 		if  pygame.sprite.spritecollide(self, self.collisions, False):
 			self.move_back()
+			collided = True
 		self.collisions.add(self)
+
+		return collided
 
 	def move_back(self):
 		if self.direction =="right":
