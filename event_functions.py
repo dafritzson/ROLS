@@ -5,14 +5,14 @@ import game_functions as gf
 
 
 '''All Event functions will be handled in this file'''
-def event_loop(settings, screen, player, menu):
+def event_loop(settings, screen, player, menu, display_box):
 	'''check for all event types'''
 	event_list = pygame.event.get()
 	for event in event_list:
 		if event.type == pygame.QUIT:
 			sys.exit()
 		elif event.type == pygame.KEYDOWN:
-			keydown(event, settings, screen, player, menu)
+			keydown(event, settings, screen, player, menu, display_box)
 		elif event.type == pygame.KEYUP:
 			keyup(event, settings, player)
 		elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -20,7 +20,7 @@ def event_loop(settings, screen, player, menu):
 			mouse_click(settings, screen, player, menu, mouse_x, mouse_y)
 
 
-def keydown(event, settings, screen, player, menu):
+def keydown(event, settings, screen, player, menu, display_box):
 	'''check for all keydowns'''
 	#If the player is alrady moving, reject the new movement direction and add that event back to the queue to process later
 
@@ -40,6 +40,9 @@ def keydown(event, settings, screen, player, menu):
 	if event.key == pygame.K_SPACE and settings.game_state == "run":
 		settings.game_state = "game menu"
 		pygame.mouse.set_visible(True)
+
+	if event.key == pygame.K_a and settings.game_state == "run" and player.ready_for_interaction:
+		display_box.message = "This is my desk"
 
 	if event.key == pygame.K_BACKSPACE and settings.game_state == "run":
 		print("talk")

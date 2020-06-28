@@ -14,8 +14,9 @@ class Player(DynamicObstacle):
 		self.rect = self.image.get_rect()
 		self.rect.center = self.screen.rect.center
 
-		#Player specific movement states
+		#Player specific states
 		self.finishing_animation = False
+		self.ready_for_interaction = False
 
 		#Load player images
 		self.image_left = [pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),
@@ -86,4 +87,10 @@ class Player(DynamicObstacle):
 		self.count=1
 		for obst in self.obstacles:
 			obst.y -= self.speed
+
+	def interaction(self):
+		self.collisions.remove(self)
+		if  pygame.sprite.spritecollide(self, self.collisions, False):
+			pass
+		self.collisions.add(self)
 

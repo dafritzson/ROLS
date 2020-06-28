@@ -8,6 +8,8 @@ import time
 import os
 import pygame	
 from pygame.sprite import Group
+from obstacle import Desk, Wall, GirlNPC
+
 
 
 #Import Function Files
@@ -57,20 +59,17 @@ def run_game():
 	#Run main game loop
 	while True:
 		clock.tick_busy_loop(30)
-		gf.update_screen(settings, screen, display_box, level_map)
+		event.event_loop(settings, screen, player, main_menu, display_box)
 
 		#State Machine
 		if settings.game_state == "main menu":
-			event.event_loop(settings, screen, player, main_menu)
 			gf.run_menu(settings, screen, player, main_menu)
 
 		elif settings.game_state == "game menu":
-			event.event_loop(settings, screen, player, game_menu)
 			gf.run_menu(settings, screen, player, game_menu)
 
 		elif settings.game_state == "run":	
-			event.event_loop(settings, screen, player, main_menu)
-			gf.update_game(settings, obstacles)
+			gf.update_game(settings, obstacles, player, collisions)
 			gf.update_player(settings, screen, player, display_box)
 			gf.draw_display(settings, screen, player, level_map, display_box, obstacles)
 

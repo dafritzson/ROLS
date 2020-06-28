@@ -21,15 +21,15 @@ class DisplayBox():
 
 		#Load dsiplay box
 		self.rect = pygame.Rect(self.left, self.top, self.width, self.height)
+		self.message = "hello the_Guy"
 		
 		self.prep_message()
 
 
 	def prep_message(self):
 		'''prep the dislay box image'''
-		message = "hello the_Guy"
-		#box_str = "{:,}".format(message)
-		self.message_image = self.font.render(message, True, self.text_color, self.color)
+
+		self.message_image = self.font.render(self.message, True, self.text_color, self.color)
 
 		#Display message in the display box
 		self.message_rect = self.message_image.get_rect()

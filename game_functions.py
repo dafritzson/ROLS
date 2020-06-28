@@ -18,10 +18,20 @@ def update_screen(settings, screen, display_box, level_map):
 	'''Redraw the screen during each pass through the loop to prep for next frame of game image'''
 	screen.fill()
 
-def update_game(settings, obstacles):
-	#Draw obstacles
+def update_game(settings, obstacles, player, collisions):
+	#Update obstacle positions
 	for obstacle in obstacles:
 		obstacle.update()
+		if obstacle.interactable == True:
+			#if pygame.sprite.collide_rect(obstacle, player):
+			#	print("press enter")
+			if player.rect.colliderect(obstacle.rect):
+				player.ready_for_interaction = True
+				break
+			else:
+				player.ready_for_interaction = False
+	#Check for player interactions
+	player.interaction
 		
 
 def update_player(settings, screen, player, display_box):
@@ -75,6 +85,7 @@ def draw_display(settings, screen, player, level_map, display_box, obstacles):
 	player.blitme()
 	for obstacle in obstacles:
 		obstacle.blitme()
+	display_box.prep_message()	
 	display_box.blitme()
 
 def generate_obstacles(settings, screen, level_map, obstacles):

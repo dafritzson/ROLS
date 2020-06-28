@@ -1,7 +1,6 @@
 import pygame
 from pygame.sprite import Sprite
 
-
 class Obstacle(Sprite):
 	def __init__(self, settings, screen, level_map, x, y):
 		super(Obstacle, self).__init__()
@@ -12,6 +11,11 @@ class Obstacle(Sprite):
 		self.y = y
 		self.image = None
 		self.rect = None
+		self.rect_interaction = None
+		self.interactable = False
+
+	def interact_with_player(self):
+		pass
 
 	def update(self):
 		pass
@@ -37,8 +41,10 @@ class Desk(StaticObstacle):
 		self.image = pygame.image.load('.\\Images\\Objects\\desk.png')
 		self.image = pygame.transform.scale(self.image, (55, 40))
 		self.rect = self.image.get_rect()
-		self.screen_rect = self.screen.rect
-		
+
+		self.rect_interaction = self.rect.inflate(0, 0)
+		self.interactable = True
+
 
 class Wall(StaticObstacle):
 	def __init__(self, settings, screen, level_map, x, y):
@@ -72,7 +78,7 @@ class DynamicObstacle(Obstacle):
 		self.y = float(self.rect.y)
 
 
-	#Functions to move the player in different directions with corresponding animation
+	#Functions to move the Dynamic Obstacle in different directions with corresponding animation
 	def move_right(self):
 		self.x = self.x + self.speed
 		self.image = self.image_right[self.animation_count % 12]
@@ -123,6 +129,10 @@ class GirlNPC(DynamicObstacle):
 		self.image = pygame.image.load('.\\Images\\Character\\the_girl.png')
 		self.image = pygame.transform.scale(self.image, (35, 85))
 		self.rect = self.image.get_rect()
+		self.rect_interaction = self.rect.inflate(20, 20)
+		self.interactable = False
+
+
 
 
 		#First move direction
@@ -134,28 +144,28 @@ class GirlNPC(DynamicObstacle):
 		self.check_collisions()
 		if self.moving_right:
 			if self.x < 700:
-				self.x += self.speed
+				self.x = self.x + self.speed
 				self.direction ="right"
 			else:
 				self.moving_right = False
 				self.moving_down = True
 		elif self.moving_down:
 			if self.y < 300:
-				self.y += self.speed
+				self.y = self.y + self.speed
 				self.direction ="down"
 			else:	
 				self.moving_down = False
 				self.moving_up = True
 		elif self.moving_up:
 			if self.y > 100:
-				self.y -= self.speed
+				self.y = self.y - self.speed
 				self.direction ="up"
 			else:
 				self.moving_up = False
 				self.moving_left = True
 		elif self.moving_left:
 			if self.x > 500:
-				self.x -= self.speed
+				self.x = self.x - self.speed
 				self.direction ="left"
 			else:
 				self.moving_left = False
