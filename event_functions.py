@@ -13,6 +13,7 @@ def event_loop(settings, screen, player, menu, display_box):
 			sys.exit()
 		elif event.type == pygame.KEYDOWN:
 			keydown(event, settings, screen, player, menu, display_box)
+			print("down")
 		elif event.type == pygame.KEYUP:
 			keyup(event, settings, player)
 		elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -23,11 +24,12 @@ def event_loop(settings, screen, player, menu, display_box):
 def keydown(event, settings, screen, player, menu, display_box):
 	'''check for all keydowns'''
 	#If the player is alrady moving, reject the new movement direction and add that event back to the queue to process later
-
-	if player.move_in_progress == True:
+	if player.move_in_progress == True or player.finishing_animation == True:
 			pygame.event.post(event)
+
 	#If player is not moving process the movement direction
-	if player.move_in_progress == False:
+	if player.move_in_progress == False and player.finishing_animation == False:
+		print("move")
 		if event.key == pygame.K_RIGHT:
 			player.moving_right = player.move_in_progress = True
 		elif event.key == pygame.K_LEFT:

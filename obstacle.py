@@ -73,10 +73,6 @@ class DynamicObstacle(Obstacle):
 	def movement(self):
 		pass
 
-		#Player exact positions
-		self.x = float(self.rect.x)
-		self.y = float(self.rect.y)
-
 
 	#Functions to move the Dynamic Obstacle in different directions with corresponding animation
 	def move_right(self):

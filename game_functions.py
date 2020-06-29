@@ -70,15 +70,20 @@ def update_player(settings, screen, player, display_box):
 				player.move_right()
 			elif player.direction == "left":
 				player.move_left()
+			player.on_spot = False
 		elif (player.direction == "up" or player.direction == "down") and player.rect.y % 8 != 0:
 			if player.direction == "up":
 				player.move_up()
 			elif player.direction == "down":
 				player.move_down()
+			player.on_spot = False
+
 		else:
 			player.finishing_animation = False
+			#player.on_spot=True
 	
-	if collided: player.finishing_animation = False
+	if collided: 
+		player.finishing_animation = False
 
 
 def draw_display(settings, screen, player, level_map, display_box, obstacles):
