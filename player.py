@@ -15,7 +15,6 @@ class Player(DynamicObstacle):
 		self.rect.center = self.screen.rect.center
 
 		#Player specific states
-		self.finishing_animation = False
 		self.ready_for_interaction = False
 
 		#Load player images
@@ -46,23 +45,23 @@ class Player(DynamicObstacle):
 
 #Functions for animating the player without changing their position
 	def animate_right(self):
-		self.image = self.image_right[self.animation_count % 12]
-		self.animation_count += 1
+		self.image = self.image_right[self.animation_count_f % 12]
+		self.animation_count_f += 1
 		self.direction = "right"
 
 	def animate_left(self):
-		self.image = self.image_left[self.animation_count % 12]
-		self.animation_count += 1
+		self.image = self.image_left[self.animation_count_f % 12]
+		self.animation_count_f += 1
 		self.direction = "left"
 
 	def animate_up(self):
-		self.image = self.image_up[self.animation_count % 12]
-		self.animation_count += 1
+		self.image = self.image_up[self.animation_count_f % 12]
+		self.animation_count_f += 1
 		self.direction = "up"
 
 	def animate_down(self):
-		self.image = self.image_down[self.animation_count % 12]
-		self.animation_count += 1
+		self.image = self.image_down[self.animation_count_f % 12]
+		self.animation_count_f += 1
 		self.direction = "down"
 
 #Functions to move the level_map and objects as defined by the players position

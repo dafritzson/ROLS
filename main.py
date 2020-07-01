@@ -6,9 +6,9 @@ Date: 4/26/2020
 #Import all libraries
 import time
 import os
+import random
 import pygame	
 from pygame.sprite import Group
-from obstacle import Desk, Wall, GirlNPC
 
 
 
@@ -23,7 +23,7 @@ from player import Player
 from menu import Menu, MainMenu, GameMenu
 from display_box import DisplayBox
 from level_map import LevelMap
-from obstacle import Desk, Wall, GirlNPC
+from obstacle import Desk, Wall, NPC
 
 def run_game():
 	pygame.init()
@@ -33,7 +33,11 @@ def run_game():
 	screen = Screen(settings)
 	pygame.display.set_caption("Real Office Life Simulator")
 	display_box = DisplayBox(settings, screen)
+	
+	#Create Groups
+	#obstacles defines all obstacles besides the player
 	obstacles = Group()
+	#collisions defines all collideable obstacles including the player
 	collisions = Group()
 
 
@@ -46,7 +50,8 @@ def run_game():
 	level_map.image = pygame.image.load('.\\Images\\Map\\test_map_background.png')
 
 	player = Player(settings, screen, level_map, 300, 250, collisions, display_box, obstacles)
-	girl = GirlNPC(settings, screen, level_map, 500, 100, collisions)
+	girl = NPC(settings, screen, level_map, 500, 100, collisions, 200, 50)
+	print(girl.direction)
 	obstacles.add(girl)
 
 	#Add all groups that can collide with

@@ -3,7 +3,7 @@ from pygame.sprite import collide_rect
 from menu import Menu
 from display_box import DisplayBox
 import images
-from obstacle import Desk, Wall, GirlNPC
+from obstacle import Desk, Wall, NPC
 
 
 def update_display():
@@ -21,21 +21,21 @@ def update_screen(settings, screen, display_box, level_map):
 def update_game(settings, obstacles, player, collisions):
 	#Update obstacle positions
 	for obstacle in obstacles:
+		#Updating the obstacle will move it if it is a dynamic obstacle in the obstacle group
 		obstacle.update()
 		if obstacle.interactable == True:
 			#if pygame.sprite.collide_rect(obstacle, player):
 			#	print("press enter")
 			if player.rect.colliderect(obstacle.rect):
-				player.ready_for_interaction = True
-				break
+				if player.direction == obstacle.interaction_side:
+					player.ready_for_interaction = True
+					break
 			else:
 				player.ready_for_interaction = False
-	#Check for player interactions
-	player.interaction
 		
 
 def update_player(settings, screen, player, display_box):
-	collided = player.check_collisions()
+	player.check_collisions()
 	#standard player movement to respond to player movement flags set in the event loop
 	if player.move_in_progress:
 		if player.moving_right and player.rect.right < screen.rect.right:
@@ -63,26 +63,10 @@ def update_player(settings, screen, player, display_box):
 			else:
 				player.move_down()
 
-	#Finish the animation for all movements. Only run after a keyup ends the player movement.
-	if player.finishing_animation and not player.move_in_progress and not collided:
-		if (player.direction == "right" or player.direction == "left") and player.rect.x % 8 != 0:
-			if player.direction == "right":
-				player.move_right()
-			elif player.direction == "left":
-				player.move_left()
-			player.on_spot = False
-		elif (player.direction == "up" or player.direction == "down") and player.rect.y % 8 != 0:
-			if player.direction == "up":
-				player.move_up()
-			elif player.direction == "down":
-				player.move_down()
-			player.on_spot = False
+	if player.finishing_animation and not player.move_in_progress:
+		player.finish_animation()
 
-		else:
-			player.finishing_animation = False
-			#player.on_spot=True
-	
-	if collided: 
+	if player.collided and not player.moving_back: 
 		player.finishing_animation = False
 
 
@@ -96,9 +80,9 @@ def draw_display(settings, screen, player, level_map, display_box, obstacles):
 	display_box.blitme()
 
 def generate_obstacles(settings, screen, level_map, obstacles):
-	new_desk = Desk(settings, screen, level_map, 200, 200)
+	new_desk = Desk(settings, screen, level_map, 208, 208)
 	obstacles.add(new_desk)
-	new_desk = Desk(settings, screen, level_map, 500, 250)
+	new_desk = Desk(settings, screen, level_map, 488, 240)
 	obstacles.add(new_desk)
 
 
