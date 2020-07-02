@@ -66,26 +66,26 @@ class Player(DynamicObstacle):
 
 #Functions to move the level_map and objects as defined by the players position
 	def move_map_right(self):
-		self.level_map.rect.centerx -= self.speed
+		self.level_map.rect.centerx -= self.speed_f
 		for obst in self.obstacles:
-			obst.x -= self.speed
+			obst.x -= self.speed_f
 
 	def move_map_left(self):
-		self.level_map.rect.centerx += self.speed
+		self.level_map.rect.centerx += self.speed_f
 		for obst in self.obstacles:
-			obst.x += self.speed
+			obst.x += self.speed_f
 			print(obst)
 
 	def move_map_up(self):
-		self.level_map.rect.centery += self.speed
+		self.level_map.rect.centery += self.speed_f
 		for obst in self.obstacles:
-			obst.y += self.speed
+			obst.y += self.speed_f
 
 	def move_map_down(self):
-		self.level_map.rect.centery -= self.speed
+		self.level_map.rect.centery -= self.speed_f
 		self.count=1
 		for obst in self.obstacles:
-			obst.y -= self.speed
+			obst.y -= self.speed_f
 
 	def interaction(self):
 		self.collisions.remove(self)

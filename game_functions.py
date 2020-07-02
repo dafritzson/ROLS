@@ -63,11 +63,8 @@ def update_player(settings, screen, player, display_box):
 			else:
 				player.move_down()
 
-	if player.finishing_animation and not player.move_in_progress:
+	if player.finishing_animation:
 		player.finish_animation()
-
-	if player.collided and not player.moving_back: 
-		player.finishing_animation = False
 
 
 def draw_display(settings, screen, player, level_map, display_box, obstacles):

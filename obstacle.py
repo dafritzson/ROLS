@@ -63,13 +63,13 @@ class DynamicObstacle(Obstacle):
 		# Character movement states
 		self.move_in_progress = False
 		self.moving_back = False
-		self.direction = "right"
-		self.speed = 3
+		self.direction = "down"
+		self.speed_f = 3
+		self.speed_b = 1
 		self.animation_count_f = 0
 		self.animation_count_b = 0
 
 		self.finishing_animation = False
-		self.collided = False
 
 		self.moving_right = False
 		self.moving_left = False
@@ -110,41 +110,45 @@ class DynamicObstacle(Obstacle):
 
 	#Functions to move the Dynamic Obstacle in different directions with corresponding animation
 	def move_right(self):
-		self.x = self.x + self.speed
+		self.x = self.x + self.speed_f
 		self.image = self.image_right[self.animation_count_f % 12]
 		self.animation_count_f += 1
 		self.direction = "right"
 
 	def move_left(self):
-		self.x = self.x - self.speed
+		self.x = self.x - self.speed_f
 		self.image = self.image_left[self.animation_count_f % 12]
 		self.animation_count_f += 1
 		self.direction = "left"
 
 	def move_up(self):
-		self.y = self.y - self.speed
+		self.y = self.y - self.speed_f
 		self.image = self.image_up[self.animation_count_f % 12]
 		self.animation_count_f += 1
 		self.direction = "up"
 
 	def move_down(self):
-		self.y = self.y + self.speed
+		self.y = self.y + self.speed_f
 		self.image = self.image_down[self.animation_count_f % 12]
 		self.animation_count_f += 1
 		self.direction = "down"
 
 	def check_collisions(self):
 		#If player collides with an object rectangle, stop the player from moving in that direction
-		self.collided = False
 		self.collisions.remove(self)
 		if  pygame.sprite.spritecollide(self, self.collisions, False):
 			self.move_back()
 			self.moving_back = True
-			self.collided = True
 		self.collisions.add(self)
 
 	def move_back(self):
 		self.animation_count_b += 1
+		#If colliding but moving forward this move back should cancel the players motion having him not move into the obstacle
+		if self.move_in_progress:
+			self.speed = self.speed_f
+		#If the player finishes colliding and finishes the animation it should slow its speed to 1 so that it can land on the correct pixel
+		else:
+			self.speed = self.speed_b
 		if self.direction =="right":
 			self.x = self.x - self.speed
 			self.image = self.image_right[self.animation_count_b % 12]
@@ -162,25 +166,26 @@ class DynamicObstacle(Obstacle):
 			self.image = self.image_down[self.animation_count_b % 12]
 	
 	def finish_animation(self):
-		#Finish the animation for all movements. Only run after a keyup ends the player movement.
+		#Finish the animation for all movements. Only run after a keyup ends the player movement. Also handles finishing animation after a collision.
 		if (self.direction == "right" or self.direction == "left") and self.rect.x % 8 != 0:
 			if self.moving_back:
 				self.move_back()
-			elif self.direction == "right" and not self.collided:
+			elif self.direction == "right":
 				self.move_right()
-			elif self.direction == "left" and not self.collided:
+			elif self.direction == "left":
 				self.move_left()
 		elif (self.direction == "up" or self.direction == "down") and self.rect.y % 8 != 0:
 			if self.moving_back:
 				self.move_back()
-			elif self.direction == "up" and not self.collided:
+			elif self.direction == "up":
 				self.move_up()
-			elif self.direction == "down" and not self.collided:
+			elif self.direction == "down":
 				self.move_down()
-		
 		else:
 			self.finishing_animation = False
 			self.moving_back = False
+
+
 
 class NPC(DynamicObstacle):
 	def __init__(self, settings, screen, level_map, x, y, collisions, move_width, move_height):
@@ -188,21 +193,29 @@ class NPC(DynamicObstacle):
 		self.move_width = move_width
 		self.move_height = move_height
 
+
 		#Load player image surface and define rectangle
-		self.image = pygame.image.load('.\\Images\\Character\\the_girl.png')
-		self.image = pygame.transform.scale(self.image, (35, 85))
+		self.image = pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png')
 		self.rect = self.image.get_rect()
 		self.rect_interaction = self.rect.inflate(20, 20)
+		self.left_wall = self.x - (self.move_width / 2)
+		self.right_wall = self.x + (self.move_width / 2)
+		self.top_wall = self.y - (self.move_height / 2)
+		self.bottom_wall = self.y + (self.move_height / 2)
+
+
 		self.interactable = False
-		self.speed = 1
+		self.move_count = 0
+		self.speed_f = 1
+		self.speed_b = 1
 
 		#First move direction
 		self.moving_right = True
 
 
 	def change_direction(self):
-		x = {"right": 0 ,"left":1, "up":2, "down":3}
-		rand_num = random.randint(1,3)
+		x = {"right": 0 ,"up":1, "left":2, "down":3}
+		rand_num = random.choice([1,3])
 		#print(x.get(self.direction))
 		num = (x.get(self.direction) + rand_num) % 4
 		key_list = list(x.keys()) 
@@ -211,34 +224,40 @@ class NPC(DynamicObstacle):
 
 
 	def movement(self):
-		# Leaving this as the default DynamicObstacle movement but probably should be changed to something more generic then overwritten in child classes
-		self.check_collisions()
 		rand_num = random.randint(1,100)
+		
+		#Keep NPC withing given movement rectangle
+		#if self.x <= self.left_wall or self.x >= self.right_wall or self.y <= self.top_wall or self.y >= self.bottom_wall:
+			#self.change_direction()
 
-		#60% chance to stay still
-		if rand_num<=60:
-			pass
-		#30% chance of moving in the same direction
-		elif rand_num <= 90:
-			
+
+		if self.finishing_animation:
+			self.finish_animation()
+			self.move_in_progress = False
+
+		#10% chance to stay still
+		elif rand_num <= 95:
+			self.move_in_progress = True
+			self.check_collisions()
+			#standard player movement to respond to player movement flags set in the event loop
 			if self.direction == "right":
 				self.move_right()
 			elif self.direction == "left":
-				self.move_left()
+				self.move_left()		
 			elif self.direction == "up":
-				self.move_up()
+				self.move_up()		
 			elif self.direction == "down":
 				self.move_down()
+			
+			self.finishing_animation = False
+
 		else:
 			self.change_direction()
+			self.finishing_animation = True
 
-		if self.direction == "right":
-			self.move_right()
-		elif self.direction == "left":
-			self.move_left()
-		elif self.direction == "up":
-			self.move_up()
-		elif self.direction == "down":
-			self.move_down()
+
+
+
+
 
 

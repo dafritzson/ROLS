@@ -50,8 +50,9 @@ def run_game():
 	level_map.image = pygame.image.load('.\\Images\\Map\\test_map_background.png')
 
 	player = Player(settings, screen, level_map, 300, 250, collisions, display_box, obstacles)
-	girl = NPC(settings, screen, level_map, 500, 100, collisions, 200, 50)
-	print(girl.direction)
+	girl = NPC(settings, screen, level_map, 500, 100, collisions, 50, 20)
+	boy = NPC(settings, screen, level_map, 200, 75, collisions, 50, 20)
+	obstacles.add(boy)
 	obstacles.add(girl)
 
 	#Add all groups that can collide with
