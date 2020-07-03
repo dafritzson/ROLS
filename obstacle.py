@@ -208,6 +208,8 @@ class NPC(DynamicObstacle):
 		self.move_count = 0
 		self.speed_f = 1
 		self.speed_b = 1
+		self.still_count = 0
+		self.staying_still = False
 
 		#First move direction
 		self.moving_right = True
@@ -215,9 +217,9 @@ class NPC(DynamicObstacle):
 
 	def change_direction(self):
 		x = {"right": 0 ,"up":1, "left":2, "down":3}
-		rand_num = random.choice([1,3])
+		num = random.choice([1,3])
 		#print(x.get(self.direction))
-		num = (x.get(self.direction) + rand_num) % 4
+		num = (x.get(self.direction) + num) % 4
 		key_list = list(x.keys()) 
 		val_list = list(x.values()) 
 		self.direction = key_list[val_list.index(num)]
@@ -230,30 +232,40 @@ class NPC(DynamicObstacle):
 		#if self.x <= self.left_wall or self.x >= self.right_wall or self.y <= self.top_wall or self.y >= self.bottom_wall:
 			#self.change_direction()
 
+		self.still_count += 1
 
-		if self.finishing_animation:
-			self.finish_animation()
-			self.move_in_progress = False
+		if not self.staying_still or self.still_count >15:
+			if self.finishing_animation:
+				self.finish_animation()
+				self.move_in_progress = False
 
-		#10% chance to stay still
-		elif rand_num <= 95:
-			self.move_in_progress = True
-			self.check_collisions()
-			#standard player movement to respond to player movement flags set in the event loop
-			if self.direction == "right":
-				self.move_right()
-			elif self.direction == "left":
-				self.move_left()		
-			elif self.direction == "up":
-				self.move_up()		
-			elif self.direction == "down":
-				self.move_down()
-			
-			self.finishing_animation = False
+			# % chance to stay still
+			elif rand_num < 3:
+				self.staying_still = True
+				self.change_direction()
+				self.still_count = 0
 
-		else:
-			self.change_direction()
-			self.finishing_animation = True
+			#% chance to stay still
+			#elif rand_num <= 95:
+			else:
+				self.move_in_progress = True
+				self.check_collisions()
+				#standard player movement to respond to player movement flags set in the event loop
+				if self.direction == "right":
+					self.move_right()
+				elif self.direction == "left":
+					self.move_left()		
+				elif self.direction == "up":
+					self.move_up()		
+				elif self.direction == "down":
+					self.move_down()
+				
+				self.finishing_animation = False
+
+			#Chance to change direction
+			#else:
+			#	self.change_direction()
+			#	self.finishing_animation = True
 
 
 
