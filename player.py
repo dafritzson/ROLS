@@ -74,7 +74,6 @@ class Player(DynamicObstacle):
 		self.level_map.rect.centerx += self.speed_f
 		for obst in self.obstacles:
 			obst.x += self.speed_f
-			print(obst)
 
 	def move_map_up(self):
 		self.level_map.rect.centery += self.speed_f

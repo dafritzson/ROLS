@@ -23,7 +23,7 @@ from player import Player
 from menu import Menu, MainMenu, GameMenu
 from display_box import DisplayBox
 from level_map import LevelMap
-from obstacle import Desk, Wall, NPC
+from obstacle import Desk, Wall, NPC, Item
 
 def run_game():
 	pygame.init()
@@ -39,6 +39,8 @@ def run_game():
 	obstacles = Group()
 	#collisions defines all collideable obstacles including the player
 	collisions = Group()
+	#items defines all items the player can interact with
+	items = Group()
 
 
 	#Build map and objects
@@ -52,12 +54,16 @@ def run_game():
 	player = Player(settings, screen, level_map, 300, 250, collisions, display_box, obstacles)
 	girl = NPC(settings, screen, level_map, 500, 100, collisions, 50, 20)
 	boy = NPC(settings, screen, level_map, 200, 75, collisions, 50, 20)
+	file = Item(settings, screen, level_map, 300, 75)
+	items.add(file)
 	obstacles.add(boy)
 	obstacles.add(girl)
+	obstacles.add(items)
 
 	#Add all groups that can collide with
 	collisions.add(obstacles)
 	collisions.add(player)
+	collisions.add(items)
 
 	main_menu = MainMenu(settings, screen, player)
 	game_menu = GameMenu(settings, screen, player)

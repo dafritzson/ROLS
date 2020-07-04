@@ -17,6 +17,7 @@ class Obstacle(Sprite):
 		self.rect_interaction = None
 		self.interactable = False
 		self.interaction_side = "up"
+		self.pickupable = False
 
 	def interact_with_player(self):
 		pass
@@ -36,6 +37,17 @@ class StaticObstacle(Obstacle):
 	def __init__(self, settings, screen, level_map, x, y):
 		super().__init__(settings, screen, level_map, x, y)
 
+class Item(StaticObstacle):		
+	def __init__(self, settings, screen, level_map, x, y):
+		super().__init__(settings, screen, level_map, x, y)
+		#Load image
+		self.image = pygame.image.load('.\\Images\\Objects\\desk.png')
+		self.image = pygame.transform.scale(self.image, (20, 18))
+		self.rect = self.image.get_rect()
+
+		self.rect_interaction = self.rect.inflate(0, 0)
+		self.interactable = True
+		self.pickupable = True
 
 class Desk(StaticObstacle):
 	def __init__(self, settings, screen, level_map, x, y):
