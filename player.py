@@ -4,7 +4,7 @@ from obstacle import DynamicObstacle
 
 
 class Player(DynamicObstacle):
-	def __init__(self, settings, screen, level_map, x, y, collisions, display_box, obstacles):
+	def __init__(self, settings, screen, level_map, x, y, collisions, display_box, obstacles, report):
 		super(Player, self).__init__(settings, screen, level_map, x, y, collisions,)
 		self.display_box = display_box
 		self.obstacles = obstacles
@@ -16,7 +16,13 @@ class Player(DynamicObstacle):
 
 		#Player specific states
 		self.ready_for_interaction = False
-		self.file_count = 0
+		self.interaction_obstacle = None
+
+		
+
+		
+		#Player items and game attributes
+		self.report_count = 0
 
 		#Load player images
 		self.image_left = [pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),

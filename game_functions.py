@@ -21,23 +21,35 @@ def update_screen(settings, screen, display_box, level_map):
 def update_game(settings, obstacles, player, collisions, display_box):
 	#Update obstacle positions
 	player_is_interacting = False
+	item_is_pickupable = False
+	interaction_obstacle = None
 	for obstacle in obstacles:
-		#Updating the obstacle will move it if it is a dynamic obstacle in the obstacle group
+		#Updating the obstacle will move it if it is a dynamic obstacle
 		obstacle.update()
+
+		#Functionality for obstacles that can interact with the player
 		if obstacle.interactable == True:
-			#if pygame.sprite.collide_rect(obstacle, player):
-			#	print("press enter")
 			if player.rect.colliderect(obstacle.rect):
 				if (obstacle.side_interactable and player.direction == obstacle.interaction_side) or not obstacle.side_interactable:
 						player_is_interacting = True
 						display_box.message_key = obstacle.interaction_message
+						interaction_obstacle = obstacle
 				if obstacle.pickupable:
-					print("You get a point")
+					item_is_pickupable = True
+
 	if player_is_interacting:	
 		player.ready_for_interaction = True
+
 	else:
 		player.ready_for_interaction = False
+		#player.interaction_obstacle = None
 
+	if item_is_pickupable:
+		player.can_pickup = True
+	else:
+		player.can_pickup = False
+
+	return interaction_obstacle
 def update_player(settings, screen, player, display_box):
 	player.check_collisions()
 	#standard player movement to respond to player movement flags set in the event loop

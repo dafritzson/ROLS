@@ -3,16 +3,17 @@ from time import sleep
 import pygame
 import game_functions as gf
 
-
+pygame.mixer.init()
+item_sound = pygame.mixer.music.load('.\\Audio\\Item.wav')
 '''All Event functions will be handled in this file'''
-def event_loop(settings, screen, player, menu, display_box):
+def event_loop(settings, screen, player, menu, display_box, obstacles, collisions,interaction_obstacle):
 	'''check for all event types'''
 	event_list = pygame.event.get()
 	for event in event_list:
 		if event.type == pygame.QUIT:
 			sys.exit()
 		elif event.type == pygame.KEYDOWN:
-			keydown(event, settings, screen, player, menu, display_box)
+			keydown(event, settings, screen, player, menu, display_box, obstacles, collisions, interaction_obstacle)
 		elif event.type == pygame.KEYUP:
 			keyup(event, settings, player)
 		elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -20,7 +21,7 @@ def event_loop(settings, screen, player, menu, display_box):
 			mouse_click(settings, screen, player, menu, mouse_x, mouse_y)
 
 
-def keydown(event, settings, screen, player, menu, display_box):
+def keydown(event, settings, screen, player, menu, display_box, obstacles, collisions, interaction_obstacle):
 	'''check for all keydowns'''
 	#If the player is alrady moving, reject the new movement direction and add that event back to the queue to process later
 	if player.move_in_progress == True or player.finishing_animation == True:
@@ -46,9 +47,14 @@ def keydown(event, settings, screen, player, menu, display_box):
 	#All other intraction key presses
 	if event.key == pygame.K_a and settings.game_state == "run" and player.ready_for_interaction:
 		display_box.prep_message()
+		if player.can_pickup:
+			pygame.mixer.music.play()
+			obstacles.remove(interaction_obstacle)
+			collisions.remove(interaction_obstacle)
+			player.report_count += 1
 
 	if event.key == pygame.K_BACKSPACE and settings.game_state == "run":
-		print("talk")
+		print("You have: " + str(player.report_count) + " files")
 
 	if event.key == pygame.K_9:
 		print(settings.game_state)

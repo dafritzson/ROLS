@@ -20,6 +20,8 @@ class Obstacle(Sprite):
 		self.interaction_side = "up"
 		self.pickupable = False
 		self.interaction_message = None
+		self.interaction_obstacle = None
+
 
 	def interact_with_player(self):
 		pass
@@ -49,7 +51,7 @@ class Item(StaticObstacle):
 
 		self.rect_interaction = self.rect.inflate(0, 0)
 		self.interactable = True
-		self.interaction_message = 'item'
+		self.interaction_message = 'item_report_1'
 		self.pickupable = True
 
 
@@ -230,6 +232,8 @@ class NPC(DynamicObstacle):
 		self.speed_b = 1
 		self.still_count = 0
 		self.staying_still = False
+		self.interactable = True
+		self.interaction_message = 'NPC_girl'
 
 		#First move direction
 		self.moving_right = True
@@ -253,6 +257,7 @@ class NPC(DynamicObstacle):
 			#self.change_direction()
 
 		self.still_count += 1
+		self.check_collisions()
 
 		if not self.staying_still or self.still_count >15:
 			if self.finishing_animation:
@@ -269,7 +274,6 @@ class NPC(DynamicObstacle):
 			#elif rand_num <= 95:
 			else:
 				self.move_in_progress = True
-				self.check_collisions()
 				#standard player movement to respond to player movement flags set in the event loop
 				if self.direction == "right":
 					self.move_right()

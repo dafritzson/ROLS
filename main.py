@@ -49,12 +49,14 @@ def run_game():
 	gf.build_map(settings, screen, level_map, obstacles)
 	#set map to background only:
 	level_map.image = pygame.image.load('.\\Images\\Maps\\test_map_background.png')
+	report = Item(settings, screen, level_map, 300, 75)
+	report2 = Item(settings, screen, level_map, 400, 75)
 
-	player = Player(settings, screen, level_map, 300, 250, collisions, display_box, obstacles)
+	player = Player(settings, screen, level_map, 300, 250, collisions, display_box, obstacles, report)
 	girl = NPC(settings, screen, level_map, 500, 100, collisions, 50, 20)
 	boy = NPC(settings, screen, level_map, 200, 75, collisions, 50, 20)
-	file = Item(settings, screen, level_map, 300, 75)
-	items.add(file)
+	items.add(report)
+	items.add(report2)
 	obstacles.add(boy)
 	obstacles.add(girl)
 	obstacles.add(items)
@@ -62,15 +64,15 @@ def run_game():
 	#Add all groups that can collide with
 	collisions.add(obstacles)
 	collisions.add(player)
-	collisions.add(items)
 
 	main_menu = MainMenu(settings, screen, player)
 	game_menu = GameMenu(settings, screen, player)
 
 	#Run main game loop
+	interaction_obstacle=None
 	while True:
 		clock.tick_busy_loop(30)
-		event.event_loop(settings, screen, player, main_menu, display_box)
+		event.event_loop(settings, screen, player, main_menu, display_box, obstacles, collisions, interaction_obstacle)
 
 		#State Machine
 		if settings.game_state == "main menu":
@@ -80,7 +82,7 @@ def run_game():
 			gf.run_menu(settings, screen, player, game_menu)
 
 		elif settings.game_state == "run":	
-			gf.update_game(settings, obstacles, player, collisions, display_box)
+			interaction_obstacle=gf.update_game(settings, obstacles, player, collisions, display_box)
 			gf.update_player(settings, screen, player, display_box)
 			gf.draw_display(settings, screen, player, level_map, display_box, obstacles)
 

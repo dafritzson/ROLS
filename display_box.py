@@ -25,8 +25,9 @@ class DisplayBox():
 		self.message_to_write = "Hello the_Guy"
 		self.messages = {
 		'intro' : "hello the_Guy", 
+		'NPC_girl' : "Welcome to the office",
 		'desk' : "This is my desk",
-		'item' : "Pick me up"
+		'item_report_1' : "You found a level 1 BitCorp Report"
 		}
 		self.prep_message()
 
