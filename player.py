@@ -16,6 +16,7 @@ class Player(DynamicObstacle):
 
 		#Player specific states
 		self.ready_for_interaction = False
+		self.file_count = 0
 
 		#Load player images
 		self.image_left = [pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),

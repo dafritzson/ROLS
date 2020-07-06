@@ -21,22 +21,30 @@ class DisplayBox():
 
 		#Load dsiplay box
 		self.rect = pygame.Rect(self.left, self.top, self.width, self.height)
-		self.message = "hello the_Guy"
-		
+		self.message_key = 'intro'
+		self.message_to_write = "Hello the_Guy"
+		self.messages = {
+		'intro' : "hello the_Guy", 
+		'desk' : "This is my desk",
+		'item' : "Pick me up"
+		}
 		self.prep_message()
 
 
 	def prep_message(self):
-		'''prep the dislay box image'''
+		self.message_to_write = self.messages.get(self.message_key)
+		print(self.message_key)
 
-		self.message_image = self.font.render(self.message, True, self.text_color, self.color)
+
+	def blitme(self):
+		'''prep the dislay box image'''
+		self.message_image = self.font.render(self.message_to_write, True, self.text_color, self.color)
+
 
 		#Display message in the display box
 		self.message_rect = self.message_image.get_rect()
 		self.message_rect.centerx = self.rect.centerx
 		self.message_rect.top = self.rect.centery
-
-	def blitme(self):
 		'''draw the display box rectangles to the screen'''
 		pygame.draw.rect(self.screen.display, self.color, self.rect)
 		self.screen.display.blit(self.message_image, self.message_rect)

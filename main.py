@@ -4,7 +4,6 @@ Creator: Michael Bulua
 Date: 4/26/2020
 """
 #Import all libraries
-import time
 import os
 import random
 import pygame	
@@ -49,7 +48,7 @@ def run_game():
 	gf.update_screen(settings, screen, display_box, level_map)
 	gf.build_map(settings, screen, level_map, obstacles)
 	#set map to background only:
-	level_map.image = pygame.image.load('.\\Images\\Map\\test_map_background.png')
+	level_map.image = pygame.image.load('.\\Images\\Maps\\test_map_background.png')
 
 	player = Player(settings, screen, level_map, 300, 250, collisions, display_box, obstacles)
 	girl = NPC(settings, screen, level_map, 500, 100, collisions, 50, 20)
@@ -81,7 +80,7 @@ def run_game():
 			gf.run_menu(settings, screen, player, game_menu)
 
 		elif settings.game_state == "run":	
-			gf.update_game(settings, obstacles, player, collisions)
+			gf.update_game(settings, obstacles, player, collisions, display_box)
 			gf.update_player(settings, screen, player, display_box)
 			gf.draw_display(settings, screen, player, level_map, display_box, obstacles)
 

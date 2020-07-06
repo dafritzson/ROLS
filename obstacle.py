@@ -16,8 +16,10 @@ class Obstacle(Sprite):
 		self.rect = None
 		self.rect_interaction = None
 		self.interactable = False
+		self.side_interactable = False
 		self.interaction_side = "up"
 		self.pickupable = False
+		self.interaction_message = None
 
 	def interact_with_player(self):
 		pass
@@ -47,7 +49,11 @@ class Item(StaticObstacle):
 
 		self.rect_interaction = self.rect.inflate(0, 0)
 		self.interactable = True
+		self.interaction_message = 'item'
 		self.pickupable = True
+
+
+
 
 class Desk(StaticObstacle):
 	def __init__(self, settings, screen, level_map, x, y):
@@ -60,12 +66,14 @@ class Desk(StaticObstacle):
 
 		self.rect_interaction = self.rect.inflate(0, 0)
 		self.interactable = True
+		self.side_interactable = True
+		self.interaction_message = 'desk'
 
 
 class Wall(StaticObstacle):
 	def __init__(self, settings, screen, level_map, x, y):
 		super().__init__(settings, screen, level_map, x, y)
-		self.image = pygame.image.load('.\\Images\\Map\\cubicle_wall.png')
+		self.image = pygame.image.load('.\\Images\\Maps\\cubicle_wall.png')
 		self.rect = self.image.get_rect()
 
 class DynamicObstacle(Obstacle):
@@ -216,7 +224,7 @@ class NPC(DynamicObstacle):
 		self.bottom_wall = self.y + (self.move_height / 2)
 
 
-		self.interactable = False
+		self.interactable = True
 		self.move_count = 0
 		self.speed_f = 1
 		self.speed_b = 1

@@ -24,6 +24,7 @@ def keydown(event, settings, screen, player, menu, display_box):
 	'''check for all keydowns'''
 	#If the player is alrady moving, reject the new movement direction and add that event back to the queue to process later
 	if player.move_in_progress == True or player.finishing_animation == True:
+		if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
 			pygame.event.post(event)
 
 	#If player is not moving process the movement direction
@@ -36,13 +37,15 @@ def keydown(event, settings, screen, player, menu, display_box):
 			player.moving_up = player.move_in_progress = True
 		elif event.key == pygame.K_DOWN:
 			player.moving_down = player.move_in_progress = True
-	#Process non-m0vement keydowns
+	
+	#Process non-movement keydowns
 	if event.key == pygame.K_SPACE and settings.game_state == "run":
 		settings.game_state = "game menu"
 		pygame.mouse.set_visible(True)
 
+	#All other intraction key presses
 	if event.key == pygame.K_a and settings.game_state == "run" and player.ready_for_interaction:
-		display_box.message = "This is my desk"
+		display_box.prep_message()
 
 	if event.key == pygame.K_BACKSPACE and settings.game_state == "run":
 		print("talk")

@@ -5,7 +5,7 @@ class LevelMap():
 		self.screen = screen
 		self.settings = settings
 
-		self.image = pygame.image.load('.\\Images\\Map\\test_map.png')
+		self.image = pygame.image.load('.\\Images\\Maps\\test_map.png')
 		self.rect = self.image.get_rect()
 
 		#position
