@@ -52,6 +52,8 @@ def keydown(event, settings, screen, player, menu, display_box, obstacles, colli
 			obstacles.remove(interaction_obstacle)
 			collisions.remove(interaction_obstacle)
 			player.report_count += 1
+		if player.face_me:
+			interaction_obstacle.face_player(player.direction)
 
 	if event.key == pygame.K_BACKSPACE and settings.game_state == "run":
 		print("You have: " + str(player.report_count) + " files")

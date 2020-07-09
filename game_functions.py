@@ -23,6 +23,7 @@ def update_game(settings, obstacles, player, collisions, display_box):
 	player_is_interacting = False
 	item_is_pickupable = False
 	interaction_obstacle = None
+	face_player_direction = False
 	for obstacle in obstacles:
 		#Updating the obstacle will move it if it is a dynamic obstacle
 		obstacle.update()
@@ -37,6 +38,9 @@ def update_game(settings, obstacles, player, collisions, display_box):
 				if obstacle.pickupable:
 					item_is_pickupable = True
 
+				if obstacle.is_NPC:
+					face_player_direction = True
+
 	if player_is_interacting:	
 		player.ready_for_interaction = True
 
@@ -49,7 +53,14 @@ def update_game(settings, obstacles, player, collisions, display_box):
 	else:
 		player.can_pickup = False
 
+	if face_player_direction:
+		player.face_me = True
+	else:
+		player.face_me = False
+
 	return interaction_obstacle
+
+	
 def update_player(settings, screen, player, display_box):
 	player.check_collisions()
 	#standard player movement to respond to player movement flags set in the event loop

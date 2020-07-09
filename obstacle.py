@@ -14,12 +14,17 @@ class Obstacle(Sprite):
 		self.y = y
 		self.image = None
 		self.rect = None
-		self.rect_interaction = None
+		
+		#Static Logic Attributes
 		self.interactable = False
 		self.side_interactable = False
 		self.interaction_side = "up"
 		self.pickupable = False
 		self.interaction_message = None
+		self.is_NPC = False 
+
+		#Dynamic Logic Attributes
+		self.rect_interaction = None
 		self.interaction_obstacle = None
 
 
@@ -48,13 +53,12 @@ class Item(StaticObstacle):
 		self.image = pygame.image.load('.\\Images\\Objects\\desk.png')
 		self.image = pygame.transform.scale(self.image, (20, 18))
 		self.rect = self.image.get_rect()
-
 		self.rect_interaction = self.rect.inflate(0, 0)
+
+		#Logic Attributes
 		self.interactable = True
 		self.interaction_message = 'item_report_1'
 		self.pickupable = True
-
-
 
 
 class Desk(StaticObstacle):
@@ -65,8 +69,9 @@ class Desk(StaticObstacle):
 		self.image = pygame.image.load('.\\Images\\Objects\\desk.png')
 		self.image = pygame.transform.scale(self.image, (55, 40))
 		self.rect = self.image.get_rect()
-
 		self.rect_interaction = self.rect.inflate(0, 0)
+
+		#Logic Attriutes
 		self.interactable = True
 		self.side_interactable = True
 		self.interaction_message = 'desk'
@@ -82,7 +87,9 @@ class DynamicObstacle(Obstacle):
 	def __init__(self, settings, screen, level_map, x, y, collisions):
 		super().__init__(settings, screen, level_map, x, y)
 		self.collisions = collisions
-		# Character movement states
+		
+
+		#Movement Attributes
 		self.move_in_progress = False
 		self.moving_back = False
 		self.direction = "down"
@@ -90,9 +97,7 @@ class DynamicObstacle(Obstacle):
 		self.speed_b = 1
 		self.animation_count_f = 0
 		self.animation_count_b = 0
-
 		self.finishing_animation = False
-
 		self.moving_right = False
 		self.moving_left = False
 		self.moving_up = False
@@ -128,6 +133,23 @@ class DynamicObstacle(Obstacle):
 
 	def movement(self):
 		pass
+
+
+	def face_right(self):
+		self.image = self.image_right[0]
+		self.direction = "right"
+
+	def face_left(self):
+		self.image = self.image_left[0]
+		self.direction = "left"
+
+	def face_up(self):
+		self.image = self.image_up[0]
+		self.direction = "up"
+
+	def face_down(self):
+		self.image = self.image_down[0]
+		self.direction = "down"
 
 
 	#Functions to move the Dynamic Obstacle in different directions with corresponding animation
@@ -225,24 +247,46 @@ class NPC(DynamicObstacle):
 		self.top_wall = self.y - (self.move_height / 2)
 		self.bottom_wall = self.y + (self.move_height / 2)
 
-
-		self.interactable = True
+		#Movement Attributes
 		self.move_count = 0
 		self.speed_f = 1
 		self.speed_b = 1
 		self.still_count = 0
 		self.staying_still = False
+		self.moving_right = True
+
+
+		#Logic Attributes
 		self.interactable = True
+		self.interactable = True
+		self.is_NPC = True
 		self.interaction_message = 'NPC_girl'
 
-		#First move direction
-		self.moving_right = True
+	def face_player(self, player_direction):
+		self.player_direction = player_direction
+		x = {"right": 0 ,"up":1, "left":2, "down":3}
+		num = 2
+		num = (x.get(self.player_direction) + num) % 4
+		key_list = list(x.keys()) 
+		val_list = list(x.values()) 
+		self.direction = key_list[val_list.index(num)]
+
+		if self.direction == "right":
+			self.face_right()
+		elif self.direction == "left":
+			self.face_left()		
+		elif self.direction == "up":
+			self.face_up()		
+		elif self.direction == "down":
+			self.face_down()
+
+		self.still_count = 0
+
 
 
 	def change_direction(self):
 		x = {"right": 0 ,"up":1, "left":2, "down":3}
 		num = random.choice([1,3])
-		#print(x.get(self.direction))
 		num = (x.get(self.direction) + num) % 4
 		key_list = list(x.keys()) 
 		val_list = list(x.values()) 
@@ -292,7 +336,32 @@ class NPC(DynamicObstacle):
 			#	self.finishing_animation = True
 
 
+class NPC_Still(NPC):
+	def __init__(self, settings, screen, level_map, x, y, collisions, move_width, move_height):
+		super().__init__(settings, screen, level_map, x, y, collisions, move_width, move_height)
 
+	def movement(self):
+		rand_num = random.randint(1,100)
+		self.still_count += 1
+
+		if not self.staying_still or self.still_count >30:
+
+			# % chance to stay still
+			if rand_num < 2:
+				self.staying_still = True
+				self.change_direction()
+				self.still_count = 0
+
+			else:
+				self.staying_still = False
+				if self.direction == "right":
+					self.face_right()
+				elif self.direction == "left":
+					self.face_left()		
+				elif self.direction == "up":
+					self.face_up()		
+				elif self.direction == "down":
+					self.face_down()
 
 
 

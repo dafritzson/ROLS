@@ -14,11 +14,11 @@ class Player(DynamicObstacle):
 		self.rect = self.image.get_rect()
 		self.rect.center = self.screen.rect.center
 
-		#Player specific states
+		#Logic Attributes
 		self.ready_for_interaction = False
 		self.interaction_obstacle = None
-
-		
+		self.can_pickup = False
+		self.face_me = False
 
 		
 		#Player items and game attributes

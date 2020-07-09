@@ -22,7 +22,7 @@ from player import Player
 from menu import Menu, MainMenu, GameMenu
 from display_box import DisplayBox
 from level_map import LevelMap
-from obstacle import Desk, Wall, NPC, Item
+from obstacle import Desk, Wall, NPC, NPC_Still, Item
 
 def run_game():
 	pygame.init()
@@ -54,7 +54,7 @@ def run_game():
 
 	player = Player(settings, screen, level_map, 300, 250, collisions, display_box, obstacles, report)
 	girl = NPC(settings, screen, level_map, 500, 100, collisions, 50, 20)
-	boy = NPC(settings, screen, level_map, 200, 75, collisions, 50, 20)
+	boy = NPC_Still(settings, screen, level_map, 200, 75, collisions, 50, 20)
 	items.add(report)
 	items.add(report2)
 	obstacles.add(boy)
@@ -82,7 +82,7 @@ def run_game():
 			gf.run_menu(settings, screen, player, game_menu)
 
 		elif settings.game_state == "run":	
-			interaction_obstacle=gf.update_game(settings, obstacles, player, collisions, display_box)
+			interaction_obstacle = gf.update_game(settings, obstacles, player, collisions, display_box)
 			gf.update_player(settings, screen, player, display_box)
 			gf.draw_display(settings, screen, player, level_map, display_box, obstacles)
 
