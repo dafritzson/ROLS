@@ -5,12 +5,12 @@ class LevelMap():
 		self.screen = screen
 		self.settings = settings
 
-		self.image = pygame.image.load('.\\Images\\Maps\\test_map.png')
+		self.image = pygame.image.load('.\\Images\\Maps\\map_test.png')
 		self.rect = self.image.get_rect()
 
 		#position
-		self.rect.centerx = self.screen.rect.centerx
-		self.rect.centery = self.screen.rect.centery 
+		self.rect.x = self.screen.rect.x
+		self.rect.y = self.screen.rect.y 
 
 
 	def blitme(self):

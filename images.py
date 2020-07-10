@@ -1,6 +1,6 @@
 import pygame
 
-barrier_tiles = [(255, 255, 255, 255)]
+barrier_tiles = [(0, 0, 0, 255)]
 #barrier_tiles = [(0, 21, 127, 255)]
 
 

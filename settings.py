@@ -5,7 +5,7 @@ class Settings():
 		'''initialize all attributes'''
 
 		self.bg_color = (3,181,133)
-		self.tile_size = 16
+		self.tile_size = 32
 
 		#Game Style
 		self.text_color = (4,5,8)

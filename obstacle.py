@@ -80,7 +80,7 @@ class Desk(StaticObstacle):
 class Wall(StaticObstacle):
 	def __init__(self, settings, screen, level_map, x, y):
 		super().__init__(settings, screen, level_map, x, y)
-		self.image = pygame.image.load('.\\Images\\Maps\\cubicle_wall.png')
+		self.image = pygame.image.load('.\\Images\\Maps\\cubicle1.png')
 		self.rect = self.image.get_rect()
 
 class DynamicObstacle(Obstacle):
@@ -93,7 +93,7 @@ class DynamicObstacle(Obstacle):
 		self.move_in_progress = False
 		self.moving_back = False
 		self.direction = "down"
-		self.speed_f = 3
+		self.speed_f = 2
 		self.speed_b = 1
 		self.animation_count_f = 0
 		self.animation_count_b = 0
@@ -211,14 +211,14 @@ class DynamicObstacle(Obstacle):
 	
 	def finish_animation(self):
 		#Finish the animation for all movements. Only run after a keyup ends the player movement. Also handles finishing animation after a collision.
-		if (self.direction == "right" or self.direction == "left") and self.rect.x % 8 != 0:
+		if (self.direction == "right" or self.direction == "left") and self.rect.x % 32 != 0:
 			if self.moving_back:
 				self.move_back()
 			elif self.direction == "right":
 				self.move_right()
 			elif self.direction == "left":
 				self.move_left()
-		elif (self.direction == "up" or self.direction == "down") and self.rect.y % 8 != 0:
+		elif (self.direction == "up" or self.direction == "down") and self.rect.y % 32 != 0:
 			if self.moving_back:
 				self.move_back()
 			elif self.direction == "up":
@@ -228,7 +228,6 @@ class DynamicObstacle(Obstacle):
 		else:
 			self.finishing_animation = False
 			self.moving_back = False
-
 
 
 class NPC(DynamicObstacle):

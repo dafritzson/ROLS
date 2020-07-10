@@ -2,8 +2,8 @@ import pygame
 
 pygame.init()
 
-image = pygame.image.load('.\\Images\\Maps\\carpet.png')
-tile_key = image.get_at((1, 1))
+image = pygame.image.load('.\\Images\\Maps\\cubicle.png')
+tile_key = image.get_at((0, 0))
 tile_key2 = image.get_at ((1,2))
 tile_key3 = []
 tile_key3.append(tile_key)

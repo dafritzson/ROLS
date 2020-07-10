@@ -103,8 +103,8 @@ def draw_display(settings, screen, player, level_map, display_box, obstacles):
 	display_box.blitme()
 
 def generate_obstacles(settings, screen, level_map, obstacles):
-	new_desk = Desk(settings, screen, level_map, 208, 208)
-	obstacles.add(new_desk)
+	#new_desk = Desk(settings, screen, level_map, 208, 208)
+	#obstacles.add(new_desk)
 	new_desk = Desk(settings, screen, level_map, 488, 240)
 	obstacles.add(new_desk)
 

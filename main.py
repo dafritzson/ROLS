@@ -48,13 +48,14 @@ def run_game():
 	gf.update_screen(settings, screen, display_box, level_map)
 	gf.build_map(settings, screen, level_map, obstacles)
 	#set map to background only:
-	level_map.image = pygame.image.load('.\\Images\\Maps\\test_map_background.png')
+	level_map.image = pygame.image.load('.\\Images\\Maps\\map_background_test.png')
+
 	report = Item(settings, screen, level_map, 300, 75)
 	report2 = Item(settings, screen, level_map, 400, 75)
 
-	player = Player(settings, screen, level_map, 300, 250, collisions, display_box, obstacles, report)
+	player = Player(settings, screen, level_map, 96, 236, collisions, display_box, obstacles, report)
 	girl = NPC(settings, screen, level_map, 500, 100, collisions, 50, 20)
-	boy = NPC_Still(settings, screen, level_map, 200, 75, collisions, 50, 20)
+	boy = NPC_Still(settings, screen, level_map, 96, 74, collisions, 50, 20)
 	items.add(report)
 	items.add(report2)
 	obstacles.add(boy)
@@ -68,10 +69,12 @@ def run_game():
 	main_menu = MainMenu(settings, screen, player)
 	game_menu = GameMenu(settings, screen, player)
 
+	#Set default interaction obstacle to None
+	interaction_obstacle = None
+
 	#Run main game loop
-	interaction_obstacle=None
 	while True:
-		clock.tick_busy_loop(30)
+		clock.tick_busy_loop(40)
 		event.event_loop(settings, screen, player, main_menu, display_box, obstacles, collisions, interaction_obstacle)
 
 		#State Machine
