@@ -10,21 +10,31 @@ class Player(DynamicObstacle):
 		self.obstacles = obstacles
 
 		#Default Image
-		self.image = pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png')
+		self.image = pygame.image.load('.\\Images\\Player\\player_test.png')
 		self.rect = self.image.get_rect()
+		self.image = pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png')
 		self.rect.center = self.screen.rect.center
+		self.speed_f = 3
+		self.speed_b = 1
 
 		#Logic Attributes
+		#flag for when the player is ready to interact with an obstacle when 'a' is pressed
 		self.ready_for_interaction = False
+		#flag for if the player can interact with the coliding obstacle
 		self.interaction_obstacle = None
+		#flag for if the player can pickup the interacting obstacle
 		self.can_pickup = False
+		#flag
 		self.face_me = False
+		#flag for if the map is animating and not the player
+		self.map_moving = False
 
 		
 		#Player items and game attributes
 		self.report_count = 0
 
 		#Load player images
+		'''
 		self.image_left = [pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),
 		pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left2.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left2.png'),
 		pygame.image.load('.\\Images\\Player\\Walk_Left\\left2.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left3.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left3.png'),
@@ -48,7 +58,13 @@ class Player(DynamicObstacle):
 		pygame.image.load('.\\Images\\Player\\Walk_Down\\down2.png'),pygame.image.load('.\\Images\\Player\\Walk_Down\\down3.png'),pygame.image.load('.\\Images\\Player\\Walk_Down\\down3.png'),
 		pygame.image.load('.\\Images\\Player\\Walk_Down\\down3.png'),pygame.image.load('.\\Images\\Player\\Walk_Down\\down4.png'),pygame.image.load('.\\Images\\Player\\Walk_Down\\down4.png'),
 		pygame.image.load('.\\Images\\Player\\Walk_Down\\down4.png')]
+		'''
 
+		self.image_right = [pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png')]
+		self.image_left = [pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png')]
+		self.image_up = [pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png')]
+		self.image_down = [pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png')]
+		
 
 #Functions for animating the player without changing their position
 	def animate_right(self):
@@ -71,24 +87,24 @@ class Player(DynamicObstacle):
 		self.animation_count_f += 1
 		self.direction = "down"
 
-#Functions to move the level_map and objects as defined by the players position
+#Functions to move the level_map and obstacles as defined by the players position
 	def move_map_right(self):
-		self.level_map.rect.centerx -= self.speed_f
+		self.level_map.rect.x -= self.speed_f
 		for obst in self.obstacles:
 			obst.x -= self.speed_f
 
 	def move_map_left(self):
-		self.level_map.rect.centerx += self.speed_f
+		self.level_map.rect.x += self.speed_f
 		for obst in self.obstacles:
 			obst.x += self.speed_f
 
 	def move_map_up(self):
-		self.level_map.rect.centery += self.speed_f
+		self.level_map.rect.y += self.speed_f
 		for obst in self.obstacles:
 			obst.y += self.speed_f
 
 	def move_map_down(self):
-		self.level_map.rect.centery -= self.speed_f
+		self.level_map.rect.y -= self.speed_f
 		self.count=1
 		for obst in self.obstacles:
 			obst.y -= self.speed_f

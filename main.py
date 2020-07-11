@@ -50,10 +50,14 @@ def run_game():
 	#set map to background only:
 	level_map.image = pygame.image.load('.\\Images\\Maps\\map_background_test.png')
 
-	report = Item(settings, screen, level_map, 300, 75)
-	report2 = Item(settings, screen, level_map, 400, 75)
+	#variables for positioning items on the screen
+	tile_unit = settings.tile_size
+	item_unit = settings.tile_size/2
 
-	player = Player(settings, screen, level_map, 96, 236, collisions, display_box, obstacles, report)
+	report = Item(settings, screen, level_map, item_unit*16, item_unit*3)
+	report2 = Item(settings, screen, level_map, item_unit*19, item_unit*3)
+
+	player = Player(settings, screen, level_map, tile_unit*4, tile_unit*10, collisions, display_box, obstacles, report)
 	girl = NPC(settings, screen, level_map, 500, 100, collisions, 50, 20)
 	boy = NPC_Still(settings, screen, level_map, 96, 74, collisions, 50, 20)
 	items.add(report)
@@ -74,7 +78,7 @@ def run_game():
 
 	#Run main game loop
 	while True:
-		clock.tick_busy_loop(40)
+		clock.tick_busy_loop(30)
 		event.event_loop(settings, screen, player, main_menu, display_box, obstacles, collisions, interaction_obstacle)
 
 		#State Machine

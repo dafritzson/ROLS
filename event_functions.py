@@ -14,7 +14,6 @@ def event_loop(settings, screen, player, menu, display_box, obstacles, collision
 			sys.exit()
 		elif event.type == pygame.KEYDOWN:
 			keydown(event, settings, screen, player, menu, display_box, obstacles, collisions, interaction_obstacle)
-			print(player.rect.x)
 		elif event.type == pygame.KEYUP:
 			keyup(event, settings, player)
 		elif event.type == pygame.MOUSEBUTTONDOWN:

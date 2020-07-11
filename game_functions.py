@@ -62,36 +62,62 @@ def update_game(settings, obstacles, player, collisions, display_box):
 
 	
 def update_player(settings, screen, player, display_box):
-	player.check_collisions()
-	#standard player movement to respond to player movement flags set in the event loop
-	if player.move_in_progress:
-		if player.moving_right and player.rect.right < screen.rect.right:
-			if player.rect.x > screen.rect.centerx + screen.rect.width / 3:
-				player.animate_right()
-				player.move_map_right()
-			else:
-				player.move_right()
-		elif player.moving_left and player.rect.left > screen.rect.left:
-			if player.rect.x < screen.rect.centerx - screen.rect.width / 3:
-				player.animate_left()
-				player.move_map_left()
-			else:
-				player.move_left()		
-		elif player.moving_up and player.rect.top > screen.rect.top:
-			if player.rect.y < screen.rect.height / 6:
-				player.animate_up()
-				player.move_map_up()
-			else:
-				player.move_up()		
-		elif player.moving_down and player.rect.bottom < display_box.rect.top:
-			if player.rect.y > screen.rect.centery + screen.rect.height / 8:
-				player.animate_down()
-				player.move_map_down()
-			else:
-				player.move_down()
-
+	
 	if player.finishing_animation:
 		player.finish_animation()
+	else:	
+		player.check_collisions()
+		#standard player movement to respond to player movement flags set in the event loop
+		if player.move_in_progress:
+			if player.colliding == False:
+				if player.moving_right and player.rect.right < screen.rect.right:
+					if player.rect.x > screen.rect.centerx + screen.rect.width / 3:
+						player.animate_right()
+						player.move_map_right()
+						player.map_moving = True
+					else:
+						player.move_right()
+						player.map_moving = False
+				elif player.moving_left and player.rect.left > screen.rect.left:
+					if player.rect.x < screen.rect.centerx - screen.rect.width / 3:
+						player.animate_left()
+						player.move_map_left()
+						player.map_moving = True
+					else:
+						player.move_left()
+						player.map_moving = False		
+				elif player.moving_up and player.rect.top > screen.rect.top:
+					if player.rect.y < screen.rect.height / 6:
+						player.animate_up()
+						player.move_map_up()
+						player.map_moving = True
+					else:
+						player.move_up()
+						player.map_moving = False		
+				elif player.moving_down and player.rect.bottom < display_box.rect.top:
+					if player.rect.y > screen.rect.centery + screen.rect.height / 8:
+						player.animate_down()
+						player.move_map_down()
+						player.map_moving = True
+					else:
+						player.move_down()
+						player.map_moving = False
+			else:
+				if player.moving_right:
+					player.direction = "right"
+					player.face_right()
+				elif player.moving_left:
+					player.direction = "left"
+					player.face_left()
+				elif player.moving_up:
+					player.direction = "up"
+					player.face_up()
+				elif player.moving_down:
+					player.direction = "down"
+					player.face_down()
+
+
+
 
 
 def draw_display(settings, screen, player, level_map, display_box, obstacles):
