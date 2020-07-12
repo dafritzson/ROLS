@@ -1,7 +1,9 @@
 import pygame
 
-barrier_tiles = [(0, 0, 0, 255)]
+obstacle_tiles = [(0, 0, 0, 255)]
 #barrier_tiles = [(0, 21, 127, 255)]
+
+background_tiles = [(191, 175, 163, 255)]
 
 
 #Cubicle Color Codes 16x16

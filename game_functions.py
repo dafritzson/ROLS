@@ -4,6 +4,7 @@ from menu import Menu
 from display_box import DisplayBox
 import images
 from obstacle import Desk, Wall, NPC
+from map import Carpet
 
 
 def update_display():
@@ -43,7 +44,6 @@ def update_game(settings, obstacles, player, collisions, display_box):
 
 	if player_is_interacting:	
 		player.ready_for_interaction = True
-
 	else:
 		player.ready_for_interaction = False
 		#player.interaction_obstacle = None
@@ -117,25 +117,23 @@ def update_player(settings, screen, player, display_box):
 					player.face_down()
 
 
-
-
-
-def draw_display(settings, screen, player, level_map, display_box, obstacles):
+def draw_display(settings, screen, player, level_map, display_box, map_entities):
 	screen.fill()
-	level_map.blitme()
+	#level_map.blitme()
+	for entity in map_entities:
+		entity.blitme()
 	player.blitme()
-	for obstacle in obstacles:
-		obstacle.blitme()
+
 	display_box.blitme()
 
 def generate_obstacles(settings, screen, level_map, obstacles):
-	#new_desk = Desk(settings, screen, level_map, 208, 208)
+	#new_desk = Desk( 208, 208, settings, screen, level_map)
 	#obstacles.add(new_desk)
-	new_desk = Desk(settings, screen, level_map, 488, 240)
+	new_desk = Desk(488, 240, settings, screen, level_map)
 	obstacles.add(new_desk)
 
 
-def build_map(settings, screen, level_map, obstacles):
+def build_map(settings, screen, level_map, obstacles, map_entities):
 	#For the given map recognize obstacles within the map image and add a obstacle object at its x and y location
 	for y in range(0, level_map.rect.height, settings.tile_size):
 		for x in range(0, level_map.rect.width, settings.tile_size):
@@ -149,9 +147,13 @@ def build_map(settings, screen, level_map, obstacles):
 			#tile_key8 = level_map.image.get_at((x+1, y+3))
 			#tile_key8 = level_map.image.get_at((x+2, y+3))
 
-			for tile in images.barrier_tiles:
-				if tile_key1 == tile:
-					wall = Wall(settings, screen, level_map, x, y)
+			for tile in images.obstacle_tiles:
+				if  tile == tile_key1:
+					wall = Wall(x, y, settings, screen, level_map)
 					obstacles.add(wall)
+			for tile in images.background_tiles:	
+				if  tile == tile_key1:
+					carpet = Carpet(x, y, settings, screen)
+					map_entities.add(carpet)
 
 
