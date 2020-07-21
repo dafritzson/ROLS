@@ -35,13 +35,13 @@ class MainMenu(Menu):
 		self.newgame_image = pygame.transform.scale(self.newgame_image, (150, 40))	
 		self.newgame_rect = self.newgame_image.get_rect()
 		self.newgame_rect.centerx = self.screen.rect.centerx
-		self.newgame_rect.y = self.screen.rect.y + 200
+		self.newgame_rect.centery = self.screen.rect.centery - 40
 
 		self.continuegame_image = pygame.image.load('.\\Images\\Menu\\Continue Game.png')
 		self.continuegame_image = pygame.transform.scale(self.continuegame_image, (150, 40))
 		self.continuegame_rect = self.continuegame_image.get_rect()
 		self.continuegame_rect.centerx  = self.screen.rect.centerx
-		self.continuegame_rect.y = self.screen.rect.y + 300
+		self.continuegame_rect.centery = self.screen.rect.centery + 40
 
 	def blitme(self):
 		'''draw the menu rectangles to the screen'''

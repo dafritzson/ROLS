@@ -1,3 +1,4 @@
+import time
 class Settings():
 	'''Hold all settings and back-end variables of the game'''
 
@@ -14,6 +15,8 @@ class Settings():
 		#Game State
 		self.game_state = "main menu"
 		self.game_states = ["main menu", "run", "game menu", "close"]
+		self.game_paused = False
+
 
 
 
