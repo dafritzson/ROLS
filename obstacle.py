@@ -24,10 +24,17 @@ class Obstacle(MapEntity):
 		self.pickupable = False
 		#flag for if the obstacle is an NPC
 		self.is_NPC = False 
-		#the message displayed when interacted with
-		self.interaction_message = None
-		#flag for if the obstacle modifies the player's attributes
-		self.player_modifier = False
+
+		#Dynamic Logic Attributes
+		self.rect_interaction = None
+		self.interaction_obstacle = None
+
+		# Tile location
+		self.current_tile = None
+
+
+	def interact_with_player(self):
+		pass
 
 	def update(self):
 		pass
@@ -72,37 +79,6 @@ class Desk(StaticObstacle):
 		self.interaction_message = 'desk'
 		self.interaction_side = "up"
 
-
-class CoffeeMachine(StaticObstacle):
-	def __init__(self, x, y, settings, screen, level_map):
-		super().__init__(x, y, settings, screen, level_map)
-
-		#Load image
-		self.image = pygame.image.load('.\\Images\\Objects\\coffee_machine.png')
-		self.rect = self.image.get_rect()
-
-		#Logic Attriutes
-		self.interactable = True
-		self.side_interactable = True
-		self.interaction_message = 'coffee_machine'
-		self.interaction_side = "up"
-		self.player_modifier = True
-		self.player_modifier_duration = 8.0
-
-	def modify_player(self, player):
-		self.player = player
-		self.player.speed = 4
-
-	def revert_player(self, player):
-		self.player = player
-		self.player.speed = self.player.default_speed
-
-class Wall(StaticObstacle):
-	def __init__(self, x, y, settings, screen, level_map):
-		super().__init__(x, y, settings, screen, level_map)
-		self.image = pygame.image.load('.\\Images\\Maps\\cubicle1.png')
-		self.rect = self.image.get_rect()
-
 '''
 **************************************************************************************************************************************************************************
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -137,6 +113,11 @@ class DynamicObstacle(Obstacle):
 		#Attribute that should only be true for the player, but must be defined for all Dynamic Obstacles
 		self.map_moving = False
 
+		# Target locations for moving to the next tile
+		self.targetX = 0
+		self.targetY = 0
+
+		'''
 		self.image_left = [pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),
 		pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left2.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left2.png'),
 		pygame.image.load('.\\Images\\Player\\Walk_Left\\left2.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left3.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left3.png'),

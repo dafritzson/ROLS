@@ -3,8 +3,8 @@ from pygame.sprite import Sprite
 from obstacle import Character
 
 
-class Player(Character):
-	def __init__(self, x, y, settings, screen, level_map, collisions, display_box, obstacles, map_entities, golden_map_tile):
+class Player(DynamicObstacle):
+	def __init__(self, x, y, settings, screen, level_map, collisions, display_box, obstacles, map_entities, golden_map_tile, tile_list):
 		super(Player, self).__init__(x, y, settings, screen, level_map, collisions)
 		self.display_box = display_box
 		self.obstacles = obstacles
@@ -26,6 +26,18 @@ class Player(Character):
 		
 		#Player items and game attributes
 		self.report_count = 0
+		
+		# Initialize player location by selecting a tile. In this example, we'll try starting on the third walkable tile.
+		tile_counter = 0
+		for tile in tile_list:
+			if tile.walkable:
+				tile_counter += 1
+				if tile_counter == 50:
+					self.current_tile = tile
+		print(tile_counter)
+		self.x = self.current_tile.centerX
+		self.y = self.current_tile.centerY
+				
 
 		#Load player images
 		
@@ -104,24 +116,107 @@ class Player(Character):
 			pass
 		self.collisions.add(self)
 
-	
-	def finish_animation(self):
-		#Finish the animation for all movements. Only run after a keyup ends the player movement. Also handles finishing animation after a collision.
-		if self.finishing_animation:
-			self.player_x_round = self.settings.tile_size * round(self.x / self.settings.tile_size)
-			self.player_y_round = self.settings.tile_size * round(self.y / self.settings.tile_size)
-			self.golden_x_round = self.settings.tile_size * round(self.golden_map_tile.rect.x / self.settings.tile_size)
-			self.golden_y_round = self.settings.tile_size * round(self.golden_map_tile.rect.y / self.settings.tile_size)
-			if self.map_moving == False:
-				if self.direction == "right" or self.direction == "left":
-					if abs(self.x - self.player_x_round) <= self.speed:
-						self.finishing_animation = False
-						self.x = self.player_x_round
-					else:
-						if self.direction == "right":
-							self.move_right()
-						elif self.direction == "left":
-							self.move_left()
+	def move_right(self, target_tile):
+		self.targetX = target_tile.centerX
+		if self.x < self.targetX:
+			self.x = self.x + self.speed
+		else:
+			self.finishing_animation = False
+			self.move_in_progress = False
+			self.current_tile = target_tile
+
+		self.image = self.image_right[self.animation_count_f % 12]
+		self.animation_count_f += 1
+		self.direction = "right"
+
+	def move_left(self, target_tile):
+		self.targetX = target_tile.centerX
+		if self.x > self.targetX:
+			self.x = self.x - self.speed
+		else:
+			self.finishing_animation = False
+			self.move_in_progress = False
+			self.current_tile = target_tile
+
+		self.image = self.image_left[self.animation_count_f % 12]
+		self.animation_count_f += 1
+		self.direction = "left"
+
+	def move_up(self, target_tile):
+		self.targetY = target_tile.centerY
+		if self.y > self.targetY:
+			self.y = self.y - self.speed
+		else:
+			self.finishing_animation = False
+			self.move_in_progress = False
+			self.current_tile = target_tile
+
+		self.image = self.image_up[self.animation_count_f % 12]
+		self.animation_count_f += 1
+		self.direction = "up"
+
+	def move_down(self, target_tile):
+		self.targetY = target_tile.centerY
+		if self.y < self.targetY:
+			self.y = self.y + self.speed
+		else:
+			self.finishing_animation = False
+			self.move_in_progress = False
+			self.current_tile = target_tile
+
+		self.image = self.image_down[self.animation_count_f % 12]
+		self.animation_count_f += 1
+		self.direction = "down"
+
+
+	def finish_animation(self, tile_list):
+		#Finish the animation for all movements. Also handles finishing animation after a collision.
+		if self.map_moving == False:
+			if self.direction == "right" or self.direction == "left":
+				# if (((self.x + self.speed) % self.settings.tile_size) < (self.x  % self.settings.tile_size) or ((self.x - self.speed) % self.settings.tile_size) > (self.x  % self.settings.tile_size)) or self.x % self.settings.tile_size == 0:
+				# 	self.x = self.settings.tile_size * round(self.x / self.settings.tile_size)
+				# 	self.finishing_animation = False
+				# else:
+				if self.direction == "right":
+					for tile in tile_list:
+						if tile.tileY == self.current_tile.tileY and tile.tileX == self.current_tile.tileX + 1:
+							self.move_right(tile)
+				elif self.direction == "left":
+					for tile in tile_list:
+						if tile.tileY == self.current_tile.tileY and tile.tileX == self.current_tile.tileX - 1:
+							self.move_left(tile)
+			
+			elif self.direction == "up" or self.direction == "down":
+				# if (((self.y + self.speed) % self.settings.tile_size) < (self.y % self.settings.tile_size) or ((self.y - self.speed) % self.settings.tile_size) > (self.y  % self.settings.tile_size)) or self.y % self.settings.tile_size == 0:
+				# 	self.y = self.settings.tile_size * round(self.y / self.settings.tile_size)
+				# 	self.finishing_animation = False
+				# else:
+				if self.direction == "up":
+					for tile in tile_list:
+						if tile.tileX == self.current_tile.tileX and tile.tileY == self.current_tile.tileY - 1:
+							self.move_up(tile)
+				elif self.direction == "down":
+					for tile in tile_list:
+						if tile.tileX == self.current_tile.tileX and tile.tileY == self.current_tile.tileY + 1:
+							self.move_down(tile)
+
+			else:
+				self.finishing_animation = False
+		
+		#finishing the level_map animation and player animates in place
+		else:
+			if self.direction == "right" or self.direction == "left":
+				if (((self.golden_map_tile.rect.x + self.speed) % self.settings.tile_size) < (self.golden_map_tile.rect.x  % self.settings.tile_size) or ((self.golden_map_tile.rect.x - self.speed) % self.settings.tile_size) > (self.golden_map_tile.rect.x  % self.settings.tile_size)) or self.golden_map_tile.rect.x % self.settings.tile_size == 0:
+					self.golden_map_tile.rect.x = self.settings.tile_size * round(self.golden_map_tile.rect.x / self.settings.tile_size)
+					self.finishing_animation = False
+					
+				else:
+					if self.direction == "right":
+						self.animate_right()
+						self.move_map_right()
+					elif self.direction == "left":
+						self.animate_left()
+						self.move_map_left()
 				
 				elif self.direction == "up" or self.direction == "down":
 					if abs(self.y - self.player_y_round) <= self.speed:

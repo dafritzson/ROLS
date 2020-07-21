@@ -26,25 +26,20 @@ def event_loop(settings, screen, player, menu, display_box, obstacles, map_entit
 def keydown(event, settings, screen, player, menu, display_box, obstacles, map_entities, collisions, interaction_obstacle, timers):
 	'''check for all keydowns'''
 	#If the player is alrady moving, reject the new movement direction and add that event back to the queue to process later
-	if settings.game_paused == False:
-		if player.move_in_progress == True or player.finishing_animation == True:
-			if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-				pygame.event.post(event)
+	# if player.move_in_progress == True or player.finishing_animation == True:
+	# 	if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+	# 		pygame.event.post(event)
 
-		#If player is not moving process the movement direction
-		if player.move_in_progress == False and player.finishing_animation == False:
-			if event.key == pygame.K_RIGHT:
-				player.moving_right = player.move_in_progress = True
-				player.direction = "right"
-			elif event.key == pygame.K_LEFT:
-				player.moving_left = player.move_in_progress  = True
-				player.direction = "left"
-			elif event.key == pygame.K_UP:
-				player.moving_up = player.move_in_progress = True
-				player.direction = "up"
-			elif event.key == pygame.K_DOWN:
-				player.moving_down = player.move_in_progress = True
-				player.direction = "down"
+	#If player is not moving process the movement direction
+	if player.move_in_progress == False and player.finishing_animation == False:
+		if event.key == pygame.K_RIGHT:
+			player.moving_right = player.move_in_progress = True
+		elif event.key == pygame.K_LEFT:
+			player.moving_left = player.move_in_progress  = True
+		elif event.key == pygame.K_UP:
+			player.moving_up = player.move_in_progress = True
+		elif event.key == pygame.K_DOWN:
+			player.moving_down = player.move_in_progress = True
 	
 	#All other intraction key presses
 

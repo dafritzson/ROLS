@@ -4,8 +4,8 @@ from pygame.sprite import collide_rect
 from menu import Menu
 from display_box import DisplayBox
 import images
-from obstacle import Desk, Wall, NPC, CoffeeMachine
-from map_entity import Carpet
+from obstacle import Desk, NPC
+from map import Carpet, Wall
 
 
 def update_display():
@@ -52,19 +52,80 @@ def update_game(settings, obstacles, player, collisions, display_box, timers):
 				break
 	return interaction_obstacle
 	
-
+def update_player(settings, screen, player, display_box, tile_list):
 	
-def update_player(settings, screen, player, display_box, golden_map_tile, map_entities):
-	if not settings.game_paused:	
-		if player.finishing_animation:
-			player.finish_animation()
-
+	if player.finishing_animation:
+		player.finish_animation(tile_list)
+	else:	
 		player.check_collisions()
-		if player.colliding:
-			for ent in map_entities:
-				ent.x = player.round_to_tileset(ent.x)
-				ent.y = player.round_to_tileset(ent.y)
-			if player.move_in_progress:
+		#standard player movement to respond to player movement flags set in the event loop
+		# If keydown has happened so player should move
+		if player.move_in_progress:
+			# If player is not colliding with anything
+			if player.colliding == False:
+				# If right arrow is pressed and player is not about to run off the right side of screen
+				if player.moving_right and player.rect.right < screen.rect.right:
+					# If player is near edge of screen, move the map but not the player
+					if player.rect.x > screen.rect.centerx + screen.rect.width / 3:
+						player.animate_right()
+						player.move_map_right()
+						player.map_moving = True
+					else:
+						for tile in tile_list:
+							if tile.tileY == player.current_tile.tileY and tile.tileX == player.current_tile.tileX + 1:
+								print('current_tile: ({}, {})'.format(player.current_tile.tileX, player.current_tile.tileY))
+								print('coordinates: ({}, {})'.format(player.current_tile.centerX, player.current_tile.centerY))
+								print('target_tile: ({}, {})'.format(tile.tileX, tile.tileY))
+								print('coordinates: ({}, {})'.format(tile.centerX, tile.centerY))
+								player.move_right(tile)
+								player.finishing_animation = True
+						player.map_moving = False
+				elif player.moving_left and player.rect.left > screen.rect.left:
+					if player.rect.x < screen.rect.centerx - screen.rect.width / 3:
+						player.animate_left()
+						player.move_map_left()
+						player.map_moving = True
+					else:
+						for tile in tile_list:
+							if tile.tileY == player.current_tile.tileY and tile.tileX == player.current_tile.tileX - 1:
+								print('current_tile: ({}, {})'.format(player.current_tile.tileX, player.current_tile.tileY))
+								print('coordinates: ({}, {})'.format(player.current_tile.centerX, player.current_tile.centerY))
+								print('target_tile: ({}, {})'.format(tile.tileX, tile.tileY))
+								print('coordinates: ({}, {})'.format(tile.centerX, tile.centerY))
+								player.move_left(tile)
+								player.finishing_animation = True
+						player.map_moving = False		
+				elif player.moving_up and player.rect.top > screen.rect.top:
+					if player.rect.y < screen.rect.height / 6:
+						player.animate_up()
+						player.move_map_up()
+						player.map_moving = True
+					else:
+						for tile in tile_list:
+							if tile.tileX == player.current_tile.tileX and tile.tileY == player.current_tile.tileY - 1:
+								print('current_tile: ({}, {})'.format(player.current_tile.tileX, player.current_tile.tileY))
+								print('coordinates: ({}, {})'.format(player.current_tile.centerX, player.current_tile.centerY))
+								print('target_tile: ({}, {})'.format(tile.tileX, tile.tileY))
+								print('coordinates: ({}, {})'.format(tile.centerX, tile.centerY))
+								player.move_up(tile)
+								player.finishing_animation = True
+						player.map_moving = False		
+				elif player.moving_down and player.rect.bottom < display_box.rect.top:
+					if player.rect.y > screen.rect.centery + screen.rect.height / 8:
+						player.animate_down()
+						player.move_map_down()
+						player.map_moving = True
+					else:
+						for tile in tile_list:
+							if tile.tileX == player.current_tile.tileX and tile.tileY == player.current_tile.tileY + 1:
+								print('current_tile: ({}, {})'.format(player.current_tile.tileX, player.current_tile.tileY))
+								print('coordinates: ({}, {})'.format(player.current_tile.centerX, player.current_tile.centerY))
+								print('target_tile: ({}, {})'.format(tile.tileX, tile.tileY))
+								print('coordinates: ({}, {})'.format(tile.centerX, tile.centerY))
+								player.move_down(tile)
+								player.finishing_animation = True
+						player.map_moving = False
+			else:
 				if player.moving_right:
 					player.face_right()
 				elif player.moving_left:
@@ -135,8 +196,10 @@ def generate_obstacles(settings, screen, level_map, obstacles):
 	obstacles.add(coffee_machine)
 
 
-def build_map(settings, screen, level_map, obstacles, map_entities):
-	#For the given map recognize obstacles within the map image and add a obstacle object at its x and y location
+def build_map(settings, screen, level_map, obstacles, map_entities, tile_list):
+	#For the given map recognize obstacles within the map image and add an obstacle object at its x and y location
+	tile_x = 0
+	tile_y = 0
 	for y in range(0, level_map.rect.height, settings.tile_size):
 		for x in range(0, level_map.rect.width, settings.tile_size):
 			tile_key1 = level_map.image.get_at((x, y))
@@ -151,11 +214,27 @@ def build_map(settings, screen, level_map, obstacles, map_entities):
 
 			for tile in images.obstacle_tiles:
 				if  tile == tile_key1:
-					wall = Wall(x, y, settings, screen, level_map)
+					wall = Wall(x, y, settings, screen)
+					wall.centerX = x + settings.tile_size / 2
+					wall.centerY = y + settings.tile_size / 2
+					wall.tileX = tile_x
+					wall.tileY = tile_y
 					obstacles.add(wall)
+					tile_list.add(wall)
+					tile_x += 1
 			for tile in images.background_tiles:	
 				if  tile == tile_key1:
 					carpet = Carpet(x, y, settings, screen)
+					carpet.centerX = x + settings.tile_size / 2
+					carpet.centerY = y + settings.tile_size / 2
+					carpet.tileX = tile_x
+					carpet.tileY = tile_y
 					map_entities.add(carpet)
+					tile_list.add(carpet)
+					tile_x += 1
+		# Keep track of tile row and column to provide grid position
+		tile_y += 1
+		tile_x = 0
+	print('tile_list length: {}'.format(len(tile_list)))
 
 
