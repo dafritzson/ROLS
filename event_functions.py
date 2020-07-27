@@ -9,6 +9,7 @@ item_sound = pygame.mixer.music.load('.\\Audio\\Item.wav')
 def event_loop(settings, screen, player, menu, display_box, obstacles, collisions,interaction_obstacle):
 	'''check for all event types'''
 	event_list = pygame.event.get()
+	print(event_list)
 	for event in event_list:
 		if event.type == pygame.QUIT:
 			sys.exit()
@@ -23,10 +24,11 @@ def event_loop(settings, screen, player, menu, display_box, obstacles, collision
 
 def keydown(event, settings, screen, player, menu, display_box, obstacles, collisions, interaction_obstacle):
 	'''check for all keydowns'''
+	print('KEYDOWN BABY')
 	#If the player is alrady moving, reject the new movement direction and add that event back to the queue to process later
-	# if player.move_in_progress == True or player.finishing_animation == True:
-	# 	if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-	# 		pygame.event.post(event)
+	if player.move_in_progress == True or player.finishing_animation == True:
+		if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+			pygame.event.post(event)
 
 	#If player is not moving process the movement direction
 	if player.move_in_progress == False and player.finishing_animation == False:
@@ -65,16 +67,16 @@ def keyup(event, settings, player):
 	'''check for all keyups'''
 	if event.key == pygame.K_RIGHT and player.moving_right:
 		player.moving_right = player.move_in_progress = False
-		player.finishing_animation = True
+		# player.finishing_animation = True
 	elif event.key == pygame.K_LEFT and player.moving_left:
 		player.moving_left =  player.move_in_progress = False
-		player.finishing_animation = True
+		# player.finishing_animation = True
 	elif event.key == pygame.K_UP and player.moving_up:
 		player.moving_up = player.move_in_progress = False
-		player.finishing_animation = True
+		# player.finishing_animation = True
 	elif event.key == pygame.K_DOWN and player.moving_down:
 		player.moving_down =  player.move_in_progress = False
-		player.finishing_animation = True
+		# player.finishing_animation = True
 	else:
 		pygame.event.clear()
 

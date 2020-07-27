@@ -62,7 +62,7 @@ def update_game(settings, obstacles, player, collisions, display_box):
 
 	
 def update_player(settings, screen, player, display_box, tile_list):
-	
+	# print('Finishing_animation: {}'.format(player.finishing_animation))
 	if player.finishing_animation:
 		player.finish_animation(tile_list)
 	else:	
@@ -81,11 +81,7 @@ def update_player(settings, screen, player, display_box, tile_list):
 						player.map_moving = True
 					else:
 						for tile in tile_list:
-							if tile.tileY == player.current_tile.tileY and tile.tileX == player.current_tile.tileX + 1:
-								print('current_tile: ({}, {})'.format(player.current_tile.tileX, player.current_tile.tileY))
-								print('coordinates: ({}, {})'.format(player.current_tile.centerX, player.current_tile.centerY))
-								print('target_tile: ({}, {})'.format(tile.tileX, tile.tileY))
-								print('coordinates: ({}, {})'.format(tile.centerX, tile.centerY))
+							if tile.walkable and tile.tileY == player.current_tile.tileY and tile.tileX == player.current_tile.tileX + 1:
 								player.move_right(tile)
 								player.finishing_animation = True
 						player.map_moving = False
@@ -96,11 +92,7 @@ def update_player(settings, screen, player, display_box, tile_list):
 						player.map_moving = True
 					else:
 						for tile in tile_list:
-							if tile.tileY == player.current_tile.tileY and tile.tileX == player.current_tile.tileX - 1:
-								print('current_tile: ({}, {})'.format(player.current_tile.tileX, player.current_tile.tileY))
-								print('coordinates: ({}, {})'.format(player.current_tile.centerX, player.current_tile.centerY))
-								print('target_tile: ({}, {})'.format(tile.tileX, tile.tileY))
-								print('coordinates: ({}, {})'.format(tile.centerX, tile.centerY))
+							if tile.walkable and tile.tileY == player.current_tile.tileY and tile.tileX == player.current_tile.tileX - 1:
 								player.move_left(tile)
 								player.finishing_animation = True
 						player.map_moving = False		
@@ -111,11 +103,7 @@ def update_player(settings, screen, player, display_box, tile_list):
 						player.map_moving = True
 					else:
 						for tile in tile_list:
-							if tile.tileX == player.current_tile.tileX and tile.tileY == player.current_tile.tileY - 1:
-								print('current_tile: ({}, {})'.format(player.current_tile.tileX, player.current_tile.tileY))
-								print('coordinates: ({}, {})'.format(player.current_tile.centerX, player.current_tile.centerY))
-								print('target_tile: ({}, {})'.format(tile.tileX, tile.tileY))
-								print('coordinates: ({}, {})'.format(tile.centerX, tile.centerY))
+							if tile.walkable and tile.tileX == player.current_tile.tileX and tile.tileY == player.current_tile.tileY - 1:
 								player.move_up(tile)
 								player.finishing_animation = True
 						player.map_moving = False		
@@ -126,11 +114,11 @@ def update_player(settings, screen, player, display_box, tile_list):
 						player.map_moving = True
 					else:
 						for tile in tile_list:
-							if tile.tileX == player.current_tile.tileX and tile.tileY == player.current_tile.tileY + 1:
-								print('current_tile: ({}, {})'.format(player.current_tile.tileX, player.current_tile.tileY))
-								print('coordinates: ({}, {})'.format(player.current_tile.centerX, player.current_tile.centerY))
-								print('target_tile: ({}, {})'.format(tile.tileX, tile.tileY))
-								print('coordinates: ({}, {})'.format(tile.centerX, tile.centerY))
+							if tile.walkable and tile.tileX == player.current_tile.tileX and tile.tileY == player.current_tile.tileY + 1:
+								# print('current_tile: ({}, {})'.format(player.current_tile.tileX, player.current_tile.tileY))
+								# print('coordinates: ({}, {})'.format(player.current_tile.centerX, player.current_tile.centerY))
+								# print('target_tile: ({}, {})'.format(tile.tileX, tile.tileY))
+								# print('coordinates: ({}, {})'.format(tile.centerX, tile.centerY))
 								player.move_down(tile)
 								player.finishing_animation = True
 						player.map_moving = False

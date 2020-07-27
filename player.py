@@ -137,7 +137,7 @@ class Player(DynamicObstacle):
 			self.x = self.x + self.speed
 		else:
 			self.finishing_animation = False
-			self.move_in_progress = False
+			# self.move_in_progress = False
 			self.current_tile = target_tile
 
 		self.image = self.image_right[self.animation_count_f % 12]
@@ -150,7 +150,7 @@ class Player(DynamicObstacle):
 			self.x = self.x - self.speed
 		else:
 			self.finishing_animation = False
-			self.move_in_progress = False
+			# self.move_in_progress = False
 			self.current_tile = target_tile
 
 		self.image = self.image_left[self.animation_count_f % 12]
@@ -163,7 +163,7 @@ class Player(DynamicObstacle):
 			self.y = self.y - self.speed
 		else:
 			self.finishing_animation = False
-			self.move_in_progress = False
+			# self.move_in_progress = False
 			self.current_tile = target_tile
 
 		self.image = self.image_up[self.animation_count_f % 12]
@@ -176,7 +176,7 @@ class Player(DynamicObstacle):
 			self.y = self.y + self.speed
 		else:
 			self.finishing_animation = False
-			self.move_in_progress = False
+			# self.move_in_progress = False
 			self.current_tile = target_tile
 
 		self.image = self.image_down[self.animation_count_f % 12]
@@ -187,33 +187,22 @@ class Player(DynamicObstacle):
 	def finish_animation(self, tile_list):
 		#Finish the animation for all movements. Also handles finishing animation after a collision.
 		if self.map_moving == False:
-			if self.direction == "right" or self.direction == "left":
-				# if (((self.x + self.speed) % self.settings.tile_size) < (self.x  % self.settings.tile_size) or ((self.x - self.speed) % self.settings.tile_size) > (self.x  % self.settings.tile_size)) or self.x % self.settings.tile_size == 0:
-				# 	self.x = self.settings.tile_size * round(self.x / self.settings.tile_size)
-				# 	self.finishing_animation = False
-				# else:
-				if self.direction == "right":
-					for tile in tile_list:
-						if tile.tileY == self.current_tile.tileY and tile.tileX == self.current_tile.tileX + 1:
-							self.move_right(tile)
-				elif self.direction == "left":
-					for tile in tile_list:
-						if tile.tileY == self.current_tile.tileY and tile.tileX == self.current_tile.tileX - 1:
-							self.move_left(tile)
-			
-			elif self.direction == "up" or self.direction == "down":
-				# if (((self.y + self.speed) % self.settings.tile_size) < (self.y % self.settings.tile_size) or ((self.y - self.speed) % self.settings.tile_size) > (self.y  % self.settings.tile_size)) or self.y % self.settings.tile_size == 0:
-				# 	self.y = self.settings.tile_size * round(self.y / self.settings.tile_size)
-				# 	self.finishing_animation = False
-				# else:
-				if self.direction == "up":
-					for tile in tile_list:
-						if tile.tileX == self.current_tile.tileX and tile.tileY == self.current_tile.tileY - 1:
-							self.move_up(tile)
-				elif self.direction == "down":
-					for tile in tile_list:
-						if tile.tileX == self.current_tile.tileX and tile.tileY == self.current_tile.tileY + 1:
-							self.move_down(tile)
+			if self.direction == "right":
+				for tile in tile_list:
+					if tile.tileY == self.current_tile.tileY and tile.tileX == self.current_tile.tileX + 1:
+						self.move_right(tile)
+			elif self.direction == "left":
+				for tile in tile_list:
+					if tile.tileY == self.current_tile.tileY and tile.tileX == self.current_tile.tileX - 1:
+						self.move_left(tile)
+			elif self.direction == "up":
+				for tile in tile_list:
+					if tile.tileX == self.current_tile.tileX and tile.tileY == self.current_tile.tileY - 1:
+						self.move_up(tile)
+			elif self.direction == "down":
+				for tile in tile_list:
+					if tile.tileX == self.current_tile.tileX and tile.tileY == self.current_tile.tileY + 1:
+						self.move_down(tile)
 
 			else:
 				self.finishing_animation = False

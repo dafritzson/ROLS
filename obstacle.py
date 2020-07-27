@@ -217,9 +217,9 @@ class DynamicObstacle(Obstacle):
 		else: 
 			self.collision_sprite = CollisionSprite(self.x, self.y + self.speed)
 		
-		if  pygame.sprite.spritecollide(self.collision_sprite, self.collisions, False):
+		if pygame.sprite.spritecollide(self.collision_sprite, self.collisions, False):
 			self.colliding = True
-			self.finishing_animation = True
+			# self.finishing_animation = True
 		else:
 			self.colliding = False
 		self.collisions.add(self)
