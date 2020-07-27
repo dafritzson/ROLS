@@ -27,6 +27,10 @@ class Tile(MapEntity):
 		self.tileX = 0
 		self.tileY = 0
 		self.walkable = False
+		self.top_edge = False
+		self.bottom_edge = False
+		self.left_edge = False
+		self.right_edge = False
 
 class Carpet(Tile):
 	def __init__(self, x, y, settings, screen):

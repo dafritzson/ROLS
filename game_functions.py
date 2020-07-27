@@ -81,7 +81,7 @@ def update_player(settings, screen, player, display_box, tile_list):
 						player.map_moving = True
 					else:
 						for tile in tile_list:
-							if tile.walkable and tile.tileY == player.current_tile.tileY and tile.tileX == player.current_tile.tileX + 1:
+							if not player.current_tile.right_edge and tile.walkable and tile.tileY == player.current_tile.tileY and tile.tileX == player.current_tile.tileX + 1:
 								player.move_right(tile)
 								player.finishing_animation = True
 						player.map_moving = False
@@ -92,7 +92,7 @@ def update_player(settings, screen, player, display_box, tile_list):
 						player.map_moving = True
 					else:
 						for tile in tile_list:
-							if tile.walkable and tile.tileY == player.current_tile.tileY and tile.tileX == player.current_tile.tileX - 1:
+							if not player.current_tile.left_edge and tile.walkable and tile.tileY == player.current_tile.tileY and tile.tileX == player.current_tile.tileX - 1:
 								player.move_left(tile)
 								player.finishing_animation = True
 						player.map_moving = False		
@@ -103,7 +103,7 @@ def update_player(settings, screen, player, display_box, tile_list):
 						player.map_moving = True
 					else:
 						for tile in tile_list:
-							if tile.walkable and tile.tileX == player.current_tile.tileX and tile.tileY == player.current_tile.tileY - 1:
+							if not player.current_tile.top_edge and tile.walkable and tile.tileX == player.current_tile.tileX and tile.tileY == player.current_tile.tileY - 1:
 								player.move_up(tile)
 								player.finishing_animation = True
 						player.map_moving = False		
@@ -114,7 +114,7 @@ def update_player(settings, screen, player, display_box, tile_list):
 						player.map_moving = True
 					else:
 						for tile in tile_list:
-							if tile.walkable and tile.tileX == player.current_tile.tileX and tile.tileY == player.current_tile.tileY + 1:
+							if not player.current_tile.bottom_edge and tile.walkable and tile.tileX == player.current_tile.tileX and tile.tileY == player.current_tile.tileY + 1:
 								# print('current_tile: ({}, {})'.format(player.current_tile.tileX, player.current_tile.tileY))
 								# print('coordinates: ({}, {})'.format(player.current_tile.centerX, player.current_tile.centerY))
 								# print('target_tile: ({}, {})'.format(tile.tileX, tile.tileY))
@@ -157,6 +157,8 @@ def build_map(settings, screen, level_map, obstacles, map_entities, tile_list):
 	#For the given map recognize obstacles within the map image and add an obstacle object at its x and y location
 	tile_x = 0
 	tile_y = 0
+	max_tile_x = 0
+	max_tile_y = 0
 	for y in range(0, level_map.rect.height, settings.tile_size):
 		for x in range(0, level_map.rect.width, settings.tile_size):
 			tile_key1 = level_map.image.get_at((x, y))
@@ -176,6 +178,11 @@ def build_map(settings, screen, level_map, obstacles, map_entities, tile_list):
 					wall.centerY = y + settings.tile_size / 2
 					wall.tileX = tile_x
 					wall.tileY = tile_y
+					# Setting close-edge tiles
+					if x == 0:
+						wall.left_edge = True
+					if y == 0:
+						wall.top_edge = True
 					obstacles.add(wall)
 					tile_list.add(wall)
 					tile_x += 1
@@ -186,12 +193,27 @@ def build_map(settings, screen, level_map, obstacles, map_entities, tile_list):
 					carpet.centerY = y + settings.tile_size / 2
 					carpet.tileX = tile_x
 					carpet.tileY = tile_y
+					# Setting close-edge tiles
+					if x == 0:
+						carpet.left_edge = True
+					if y == 0:
+						carpet.top_edge = True
 					map_entities.add(carpet)
 					tile_list.add(carpet)
 					tile_x += 1
 		# Keep track of tile row and column to provide grid position
+		max_tile_y = tile_y
+		max_tile_x = tile_x
 		tile_y += 1
 		tile_x = 0
+
+	# Setting far-edge tiles
+	for tile in tile_list:
+		if tile.tileX == max_tile_x:
+			tile.right_edge = True
+		if tile.tileY == max_tile_y:
+			tile.bottom_edge = True
+
 	print('tile_list length: {}'.format(len(tile_list)))
 
 
