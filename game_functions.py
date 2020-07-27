@@ -1,4 +1,3 @@
-import math
 import pygame
 from pygame.sprite import collide_rect
 from menu import Menu
@@ -20,37 +19,47 @@ def update_screen(settings, screen, display_box, level_map):
 	'''Redraw the screen during each pass through the loop to prep for next frame of game image'''
 	screen.fill()
 
-def update_game(settings, obstacles, player, collisions, display_box, timers):
-	#Update obstacles and timers
-	player.ready_for_interaction = False
-	
+def update_game(settings, obstacles, player, collisions, display_box):
+	#Update obstacle positions
+	player_is_interacting = False
+	item_is_pickupable = False
 	interaction_obstacle = None
-	player_collision = player.get_collision_rect()
-
-	current_time = pygame.time.get_ticks()
-	for timer in timers:
-		elapsed_time = timer.get_elapsed_time(current_time)
-		if elapsed_time > timer.target_time:
-			timer.requester.revert_player(player)
-			timers.remove(timer)
-		if settings.game_paused:
-			timer.paused = True
-		else:
-			timer.paused = False
-	
+	face_player_direction = False
 	for obstacle in obstacles:
 		#Updating the obstacle will move it if it is a dynamic obstacle
 		obstacle.update()
 
 		#Functionality for obstacles that can interact with the player
 		if obstacle.interactable == True:
-			if player_collision.rect.colliderect(obstacle.rect):
+			if player.rect.colliderect(obstacle.rect):
 				if (obstacle.side_interactable and player.direction == obstacle.interaction_side) or not obstacle.side_interactable:
-						player.ready_for_interaction = True
+						player_is_interacting = True
 						display_box.message_key = obstacle.interaction_message
 						interaction_obstacle = obstacle
-				break
+				if obstacle.pickupable:
+					item_is_pickupable = True
+
+				if obstacle.is_NPC:
+					face_player_direction = True
+
+	if player_is_interacting:	
+		player.ready_for_interaction = True
+	else:
+		player.ready_for_interaction = False
+		#player.interaction_obstacle = None
+
+	if item_is_pickupable:
+		player.can_pickup = True
+	else:
+		player.can_pickup = False
+
+	if face_player_direction:
+		player.face_me = True
+	else:
+		player.face_me = False
+
 	return interaction_obstacle
+
 	
 def update_player(settings, screen, player, display_box, tile_list):
 	
@@ -127,56 +136,17 @@ def update_player(settings, screen, player, display_box, tile_list):
 						player.map_moving = False
 			else:
 				if player.moving_right:
+					player.direction = "right"
 					player.face_right()
 				elif player.moving_left:
+					player.direction = "left"
 					player.face_left()
 				elif player.moving_up:
+					player.direction = "up"
 					player.face_up()
 				elif player.moving_down:
+					player.direction = "down"
 					player.face_down()
-			player.finishing_animation = False
-			player.colliding = False
-
-		
-
-		else:	
-			#print(golden_map_tile.x)
-			#standard player movement to respond to player movement flags set in the event loop
-			if player.move_in_progress:
-				if player.colliding == False:
-					if player.moving_right and player.rect.right < screen.rect.right:
-						if player.x >= screen.rect.right - settings.tile_size*20:
-							player.animate_right()
-							player.move_map_right()
-							player.map_moving = True
-						else:
-							player.move_right()
-							player.map_moving = False
-					elif player.moving_left and player.rect.left > screen.rect.left:
-						if player.x <= screen.rect.left + settings.tile_size*20:
-							player.animate_left()
-							player.move_map_left()
-							player.map_moving = True
-						else:
-							player.move_left()
-							player.map_moving = False	
-					elif player.moving_up and player.rect.top > screen.rect.top:
-						if player.y <= screen.rect.top + settings.tile_size*20:
-							player.animate_up()
-							player.move_map_up()
-							player.map_moving = True
-						else:
-							player.move_up()
-							player.map_moving = False		
-					elif player.moving_down and player.rect.bottom < screen.rect.bottom:
-						if player.y > screen.rect.bottom - settings.tile_size*20:
-							player.animate_down()
-							player.move_map_down()
-							player.map_moving = True
-						else:
-							player.move_down()
-							player.map_moving = False
-			
 
 
 def draw_display(settings, screen, player, level_map, display_box, map_entities):
@@ -186,14 +156,13 @@ def draw_display(settings, screen, player, level_map, display_box, map_entities)
 		entity.blitme()
 	player.blitme()
 
-	if display_box.visible == True:
-		display_box.blitme()
+	display_box.blitme()
 
 def generate_obstacles(settings, screen, level_map, obstacles):
-	new_desk = Desk(settings.tile_size*16, settings.tile_size*8, settings, screen, level_map)
+	#new_desk = Desk( 208, 208, settings, screen, level_map)
+	#obstacles.add(new_desk)
+	new_desk = Desk(488, 240, settings, screen, level_map)
 	obstacles.add(new_desk)
-	coffee_machine = CoffeeMachine(settings.tile_size*4, settings.tile_size*3, settings, screen, level_map)
-	obstacles.add(coffee_machine)
 
 
 def build_map(settings, screen, level_map, obstacles, map_entities, tile_list):

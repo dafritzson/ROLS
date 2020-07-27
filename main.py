@@ -9,6 +9,8 @@ import random
 import pygame	
 from pygame.sprite import Group
 
+
+
 #Import Function Files
 import event_functions as event
 import game_functions as gf
@@ -27,18 +29,19 @@ def run_game():
 	pygame.init()
 	clock = pygame.time.Clock()
 	settings = Settings()
+	#screen = pygame.display.set_mode(size=(settings.screen_width, settings.screen_height))
 	screen = Screen(settings)
 	pygame.display.set_caption("Real Office Life Simulator")
 	display_box = DisplayBox(settings, screen)
 	
 	#Create Groups
-	#obstacles is a group for all obstacles besides the player
+	#obstacles defines all obstacles besides the player
 	obstacles = Group()
-	#collisions is a group for all collideable obstacles including the player
+	#collisions defines all collideable obstacles including the player
 	collisions = Group()
-	#items is a group for all items the player can interact with
+	#items defines all items the player can interact with
 	items = Group()
-	#map_entities is a group for all obstacles, NPCs, items and background tiles that make up the map
+	#map_entities defines all obstacles, NPCs, items and background tiles that make up the map
 	map_entities = Group()
 	# tile_list defines all tiles, whether carpet or barriers. Independent of, but overlaps entirely with map_entities
 	tile_list = Group()
@@ -54,9 +57,10 @@ def run_game():
 
 	#variables for positioning items on the screen
 	tile_unit = settings.tile_size
+	item_unit = settings.tile_size/2
 
-	report = Item(tile_unit*7, tile_unit*3, settings, screen, level_map)
-	report2 = Item(tile_unit*9, tile_unit*3, settings, screen, level_map)
+	report = Item(item_unit*16, item_unit*3, settings, screen, level_map)
+	report2 = Item(item_unit*19, item_unit*3, settings, screen, level_map)
 
 	player = Player(tile_unit*4, tile_unit*10, settings, screen, level_map, collisions, display_box, obstacles, map_entities, goldenMapTile, tile_list)
 	girl = NPC(500, 100, settings, screen, level_map, collisions, 50, 20)
@@ -67,7 +71,7 @@ def run_game():
 	obstacles.add(girl)
 	obstacles.add(items)
 	map_entities.add(obstacles)
-	map_entities.add(golden_map_tile)
+	map_entities.add(goldenMapTile)
 
 
 	#Add all groups that can collide with
@@ -84,8 +88,8 @@ def run_game():
 	while True:
 		# print(goldenMapTile.rect.x)
 		clock.tick_busy_loop(30)
+		event.event_loop(settings, screen, player, main_menu, display_box, obstacles, collisions, interaction_obstacle)
 
-		event.event_loop(settings, screen, player, main_menu, display_box, obstacles, map_entities, collisions, interaction_obstacle, timers)
 
 		#State Machine
 		if settings.game_state == "main menu":

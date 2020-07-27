@@ -2,20 +2,18 @@ import sys
 from time import sleep
 import pygame
 import game_functions as gf
-from timer import Timer
-
 
 pygame.mixer.init()
 item_sound = pygame.mixer.music.load('.\\Audio\\Item.wav')
 '''All Event functions will be handled in this file'''
-def event_loop(settings, screen, player, menu, display_box, obstacles, map_entities, collisions, interaction_obstacle, timers):
+def event_loop(settings, screen, player, menu, display_box, obstacles, collisions,interaction_obstacle):
 	'''check for all event types'''
 	event_list = pygame.event.get()
 	for event in event_list:
 		if event.type == pygame.QUIT:
 			sys.exit()
 		elif event.type == pygame.KEYDOWN:
-			keydown(event, settings, screen, player, menu, display_box, obstacles, map_entities, collisions, interaction_obstacle, timers)
+			keydown(event, settings, screen, player, menu, display_box, obstacles, collisions, interaction_obstacle)
 		elif event.type == pygame.KEYUP:
 			keyup(event, settings, player)
 		elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -23,7 +21,7 @@ def event_loop(settings, screen, player, menu, display_box, obstacles, map_entit
 			mouse_click(settings, screen, player, menu, mouse_x, mouse_y)
 
 
-def keydown(event, settings, screen, player, menu, display_box, obstacles, map_entities, collisions, interaction_obstacle, timers):
+def keydown(event, settings, screen, player, menu, display_box, obstacles, collisions, interaction_obstacle):
 	'''check for all keydowns'''
 	#If the player is alrady moving, reject the new movement direction and add that event back to the queue to process later
 	# if player.move_in_progress == True or player.finishing_animation == True:
@@ -41,37 +39,21 @@ def keydown(event, settings, screen, player, menu, display_box, obstacles, map_e
 		elif event.key == pygame.K_DOWN:
 			player.moving_down = player.move_in_progress = True
 	
-	#All other intraction key presses
-
-	#Events with Action button
-	if event.key == pygame.K_a and settings.game_paused == True:
-		display_box.visible = False
-		settings.game_paused = False
-	elif event.key == pygame.K_a and settings.game_state == "run" and player.ready_for_interaction:
-		pygame.event.clear()
-		display_box.visible = True
-		settings.game_paused = True
-		display_box.prep_message()
-
-		if interaction_obstacle.pickupable:
-			pygame.mixer.music.play()
-			obstacles.remove(interaction_obstacle)
-			map_entities.remove(interaction_obstacle)
-			collisions.remove(interaction_obstacle)
-			player.report_count += 1
-
-		if interaction_obstacle.is_NPC:
-			interaction_obstacle.face_player(player.direction)
-
-		if interaction_obstacle.player_modifier:
-			interaction_obstacle.modify_player(player)
-			mod_timer = Timer(settings, interaction_obstacle, interaction_obstacle.player_modifier_duration)
-			timers.add(mod_timer)
-
-
+	#Process non-movement keydowns
 	if event.key == pygame.K_SPACE and settings.game_state == "run":
 		settings.game_state = "game menu"
 		pygame.mouse.set_visible(True)
+
+	#All other intraction key presses
+	if event.key == pygame.K_a and settings.game_state == "run" and player.ready_for_interaction:
+		display_box.prep_message()
+		if player.can_pickup:
+			pygame.mixer.music.play()
+			obstacles.remove(interaction_obstacle)
+			collisions.remove(interaction_obstacle)
+			player.report_count += 1
+		if player.face_me:
+			interaction_obstacle.face_player(player.direction)
 
 	if event.key == pygame.K_BACKSPACE and settings.game_state == "run":
 		print("You have: " + str(player.report_count) + " files")

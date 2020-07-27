@@ -1,6 +1,6 @@
 import pygame
 from pygame.sprite import Sprite
-from obstacle import Character
+from obstacle import DynamicObstacle
 
 
 class Player(DynamicObstacle):
@@ -15,14 +15,21 @@ class Player(DynamicObstacle):
 		self.image = pygame.image.load('.\\Images\\Player\\player_test.png')
 		self.rect = self.image.get_rect()
 		self.image = pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png')
-		self.default_speed = 2
-		self.speed = self.default_speed
+		#self.rect.center = self.screen.rect.center
+		self.speed = 3
 
 		#Logic Attributes
 		#flag for when the player is ready to interact with an obstacle when 'a' is pressed
 		self.ready_for_interaction = False
+		#flag for if the player can interact with the coliding obstacle
+		self.interaction_obstacle = None
+		#flag for if the player can pickup the interacting obstacle
+		self.can_pickup = False
+		#flag
+		self.face_me = False
 		#flag for if the map is animating and not the player
 		self.map_moving = False
+
 		
 		#Player items and game attributes
 		self.report_count = 0
@@ -40,7 +47,7 @@ class Player(DynamicObstacle):
 				
 
 		#Load player images
-		
+		'''
 		self.image_left = [pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),
 		pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left2.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left2.png'),
 		pygame.image.load('.\\Images\\Player\\Walk_Left\\left2.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left3.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left3.png'),
@@ -70,7 +77,7 @@ class Player(DynamicObstacle):
 		self.image_left = [pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png')]
 		self.image_up = [pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png')]
 		self.image_down = [pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png')]
-		'''
+		
 
 #Functions for animating the player without changing their position
 	def animate_right(self):
@@ -95,18 +102,26 @@ class Player(DynamicObstacle):
 
 #Functions to move the level_map and obstacles as defined by the players position
 	def move_map_right(self):
+		self.level_map.rect.x -= self.speed
+		self.direction = "right"
 		for ent in self.map_entities:
 			ent.x -= self.speed
 
 	def move_map_left(self):
+		self.level_map.rect.x += self.speed
+		self.direction = "left"
 		for ent in self.map_entities:
 			ent.x += self.speed
 
 	def move_map_up(self):
+		self.level_map.rect.y += self.speed
+		self.direction = "up"
 		for ent in self.map_entities:
 			ent.y += self.speed
 
 	def move_map_down(self):
+		self.level_map.rect.y -= self.speed
+		self.direction = "down"
 		for ent in self.map_entities:
 			ent.y -= self.speed
 
@@ -218,53 +233,18 @@ class Player(DynamicObstacle):
 						self.animate_left()
 						self.move_map_left()
 				
-				elif self.direction == "up" or self.direction == "down":
-					if abs(self.y - self.player_y_round) <= self.speed:
-						self.y = self.player_y_round
-						self.finishing_animation = False
-
-					else:
-						if self.direction == "up":
-							self.move_up()
-						elif self.direction == "down":
-							self.move_down()
-
-			#finishing the level_map animation and player animates in place
+			elif self.direction == "up" or self.direction == "down":
+				if (((self.golden_map_tile.rect.y + self.speed) % self.settings.tile_size) < (self.golden_map_tile.rect.y  % self.settings.tile_size) or ((self.golden_map_tile.rect.y - self.speed) % self.settings.tile_size) > (self.golden_map_tile.rect.y  % self.settings.tile_size)) or self.golden_map_tile.rect.y % self.settings.tile_size == 0:
+					self.golden_map_tile.rect.y = self.settings.tile_size * round(self.golden_map_tile.rect.y / self.settings.tile_size)
+					self.finishing_animation = False
+				else:
+					if self.direction == "up":
+						self.animate_up()
+						self.move_map_up()
+					elif self.direction == "down":
+						self.animate_down()
+						self.move_map_down()
 			else:
-				if self.direction == "right" or self.direction == "left":
-					if abs(self.golden_map_tile.x - self.golden_x_round) <= self.speed:
-						#self.golden_map_tile.x = self.golden_x_round
-						for ent in self.map_entities:
-							ent.x = self.round_to_tileset(ent.x)
-							ent.blitme()
-						self.finishing_animation = False
+				self.finishing_animation = False
 
-					else:
-						if self.direction == "right":
-							self.animate_right()
-							self.move_map_right()
-							
-						elif self.direction == "left":
-							self.animate_left()
-							self.move_map_left()
-					
-				elif self.direction == "up" or self.direction == "down":
-					if abs(self.golden_map_tile.y - self.golden_y_round) <= self.speed:
-						#self.golden_map_tile.y = self.golden_y_round
-						for ent in self.map_entities:
-							ent.y = self.round_to_tileset(ent.y)
-							ent.blitme()
-						self.finishing_animation = False
-
-					else:
-						if self.direction == "up":
-							self.animate_up()
-							self.move_map_up()
-						elif self.direction == "down":
-							self.animate_down()
-							self.move_map_down()
-
-	def round_to_tileset(self, value_to_round):
-		self.value_to_round = value_to_round
-		return self.settings.tile_size * round(self.value_to_round / self.settings.tile_size)
 

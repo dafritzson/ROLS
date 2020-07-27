@@ -1,7 +1,7 @@
 import random
 import pygame
 from pygame.sprite import Sprite
-from map_entity import MapEntity
+from map import MapEntity
 from collision_sprite import CollisionSprite
 
 random.seed()
@@ -12,7 +12,10 @@ class Obstacle(MapEntity):
 		self.settings = settings
 		self.screen = screen
 		self.level_map = level_map
-
+		#self.x = x
+		#self.y = y
+		self.image = None
+		self.rect = None
 		
 		#Static Logic Attributes
 		#can the obstacle interact with the player
@@ -22,7 +25,9 @@ class Obstacle(MapEntity):
 		self.interaction_side = "up"
 		#can the obstacle pe picked up by the player
 		self.pickupable = False
-		#flag for if the obstacle is an NPC
+		#the message displayed when the player interacts with this obstacle
+		self.interaction_message = None
+
 		self.is_NPC = False 
 
 		#Dynamic Logic Attributes
@@ -54,10 +59,10 @@ class Item(StaticObstacle):
 	def __init__(self, x, y, settings, screen, level_map):
 		super().__init__(x, y, settings, screen, level_map)
 		#Load image
-		self.image = pygame.image.load('.\\Images\\Objects\\item.png')
-		#self.image = pygame.transform.scale(self.image, (20, 18))
+		self.image = pygame.image.load('.\\Images\\Objects\\desk.png')
+		self.image = pygame.transform.scale(self.image, (20, 18))
 		self.rect = self.image.get_rect()
-		#self.rect_interaction = self.rect.inflate(0, 0)
+		self.rect_interaction = self.rect.inflate(0, 0)
 
 		#Logic Attributes
 		self.interactable = True
@@ -70,14 +75,15 @@ class Desk(StaticObstacle):
 		super().__init__(x, y, settings, screen, level_map)
 
 		#Load image
-		self.image = pygame.image.load('.\\Images\\Objects\\desk_test.png')
+		self.image = pygame.image.load('.\\Images\\Objects\\desk.png')
+		self.image = pygame.transform.scale(self.image, (55, 40))
 		self.rect = self.image.get_rect()
+		self.rect_interaction = self.rect.inflate(0, 0)
 
 		#Logic Attriutes
 		self.interactable = True
 		self.side_interactable = True
 		self.interaction_message = 'desk'
-		self.interaction_side = "up"
 
 '''
 **************************************************************************************************************************************************************************
@@ -142,17 +148,21 @@ class DynamicObstacle(Obstacle):
 		pygame.image.load('.\\Images\\Player\\Walk_Down\\down3.png'),pygame.image.load('.\\Images\\Player\\Walk_Down\\down4.png'),pygame.image.load('.\\Images\\Player\\Walk_Down\\down4.png'),
 		pygame.image.load('.\\Images\\Player\\Walk_Down\\down4.png')]
 		'''
+
+
+
 		self.image_right = [pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png')]
 		self.image_left = [pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png')]
 		self.image_up = [pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png')]
 		self.image_down = [pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png')]
-		'''
+		
 
 	def update(self):
 		self.movement()
 
 	def movement(self):
 		pass
+
 
 	def face_right(self):
 		self.image = self.image_right[0]
@@ -198,24 +208,22 @@ class DynamicObstacle(Obstacle):
 	def check_collisions(self):
 		#If player collides with an object rectangle, stop the player from moving in that direction
 		self.collisions.remove(self)
-		self.collision_sprite = self.get_collision_rect()
+		if self.moving_right == True:
+			self.collision_sprite = CollisionSprite(self.x + self.speed, self.y)
+		elif self.moving_left == True:
+			self.collision_sprite = CollisionSprite(self.x - self.speed, self.y)
+		elif self.moving_up == True:
+			self.collision_sprite = CollisionSprite(self.x, self.y - self.speed)
+		else: 
+			self.collision_sprite = CollisionSprite(self.x, self.y + self.speed)
 		
 		if  pygame.sprite.spritecollide(self.collision_sprite, self.collisions, False):
 			self.colliding = True
+			self.finishing_animation = True
 		else:
 			self.colliding = False
 		self.collisions.add(self)
 
-	def get_collision_rect(self):	
-		if self.direction == "right":
-			self.collision_sprite = CollisionSprite(self.x + self.speed, self.y)
-		elif self.direction == "left":
-			self.collision_sprite = CollisionSprite(self.x - self.speed, self.y)
-		elif self.direction == "up":
-			self.collision_sprite = CollisionSprite(self.x, self.y - self.speed)
-		else: 
-			self.collision_sprite = CollisionSprite(self.x, self.y + self.speed)
-		return self.collision_sprite
 	
 	def finish_animation(self):
 		#Finish the animation for all movements. Only run after a keyup ends the player movement. Also handles finishing animation after a collision.
@@ -249,19 +257,7 @@ class DynamicObstacle(Obstacle):
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 **************************************************************************************************************************************************************************
 '''
-class Character(DynamicObstacle):
-	def __init__(self, x, y, settings, screen, level_map, collisions):
-		super().__init__(x, y, settings, screen, level_map, collisions)
-
-	def blitme(self):
-		self.rect.x = self.x
-		self.rect.y = self.y
-
-		self.image_x = self.x 
-		self.image_y = self.y - self.settings.tile_size + 10
-		self.screen.display.blit(self.image, (self.image_x, self.image_y))
-
-class NPC(Character):
+class NPC(DynamicObstacle):
 	def __init__(self, x, y, settings, screen, level_map, collisions, move_width, move_height):
 		super().__init__(x, y, settings, screen, level_map, collisions)
 		self.move_width = move_width
