@@ -7,6 +7,7 @@ class Settings():
 
 		self.bg_color = (3,181,133)
 		self.tile_size = 32
+		self.framerate = 36
 
 		#Game Style
 		self.text_color = (4,5,8)

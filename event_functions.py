@@ -49,29 +49,48 @@ def keydown(event, settings, screen, player, menu, display_box, obstacles, map_e
 	#All other intraction key presses
 
 	#Events with Action button
-	if event.key == pygame.K_a and settings.game_paused == True:
-		display_box.visible = False
-		settings.game_paused = False
-	elif event.key == pygame.K_a and settings.game_state == "run" and player.ready_for_interaction:
-		pygame.event.clear()
-		display_box.visible = True
-		settings.game_paused = True
-		display_box.prep_message()
+	if event.key == pygame.K_a: 
+		if settings.game_paused == True and settings.game_state == "run":
+			if display_box.main_message_done == False:
+				#if display_box.typing == True:
+					#pass
+				#else:
+				if display_box.clear_on_click == True:
+					display_box.clear_lines()
+				else:
+					display_box.switch_lines()
+			elif display_box.message_sequence_done == False:
+				pass
+			#Close the displaybox
+			else:
+				display_box.visible = False
+				settings.game_paused = False
 
-		if interaction_obstacle.pickupable:
-			pygame.mixer.music.play()
-			obstacles.remove(interaction_obstacle)
-			map_entities.remove(interaction_obstacle)
-			collisions.remove(interaction_obstacle)
-			player.report_count += 1
+		elif settings.game_state == "run" and player.ready_for_interaction:
+			#Transfer necessary settings to build the display box based on the interaction obstacle.
+			display_box.message_key = interaction_obstacle.interaction_message
+			display_box.message_type = interaction_obstacle.message_type
+			display_box.response_options = interaction_obstacle.response_options
+			display_box.visible = True
+			display_box.hold_blit = False
+			settings.game_paused = True
+			display_box.prep_message()
 
-		if interaction_obstacle.is_NPC:
-			interaction_obstacle.face_player(player.direction)
+			if interaction_obstacle.pickupable:
+				pygame.mixer.music.play()
+				obstacles.remove(interaction_obstacle)
+				map_entities.remove(interaction_obstacle)
+				collisions.remove(interaction_obstacle)
+				player.report_count += 1
 
-		if interaction_obstacle.player_modifier:
-			interaction_obstacle.modify_player(player)
-			mod_timer = Timer(settings, interaction_obstacle, interaction_obstacle.player_modifier_duration)
-			timers.add(mod_timer)
+			if interaction_obstacle.is_NPC:
+				interaction_obstacle.face_player(player.direction)
+
+			if interaction_obstacle.player_modifier:
+				interaction_obstacle.modify_player(player)
+				timers.empty()
+				mod_timer = Timer(settings, interaction_obstacle, interaction_obstacle.player_modifier_duration)
+				timers.add(mod_timer)
 
 
 	if event.key == pygame.K_SPACE and settings.game_state == "run":

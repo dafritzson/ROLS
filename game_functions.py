@@ -16,9 +16,29 @@ def run_menu(settings, screen, player, menu):
 	'''run the main menu state'''
 	menu.blitme()
 
-def update_screen(settings, screen, display_box, level_map):
-	'''Redraw the screen during each pass through the loop to prep for next frame of game image'''
+
+def draw_display(settings, screen, player, level_map, display_box, map_entities, on_screen_entities, npcs):
+	'''
+	#try to save memory by not drawing off screen entities
+	for entity in map_entities:
+		if on_screen_entities.has(entity):
+			if entity.rect.right < screen.rect.left or entity.rect.left > screen.rect.right or entity.rect.bottom < screen.rect.top or entity.rect.top > screen.rect.bottom:
+				on_screen_entities.remove(entity)
+		else:
+			on_screen_entities.add(entity)
+	'''		
 	screen.fill()
+	for entity in map_entities:
+		entity.blitme()
+
+	#Draw NPC on top of player if it is below it
+	player.blitme()
+	for npc in npcs:
+		if npc.y > player.y:
+			npc.blitme()
+
+	if display_box.visible == True:
+		display_box.blitme()
 
 def update_game(settings, obstacles, player, collisions, display_box, timers):
 	#Update obstacles and timers
@@ -27,6 +47,7 @@ def update_game(settings, obstacles, player, collisions, display_box, timers):
 	interaction_obstacle = None
 	player_collision = player.get_collision_rect()
 
+	#Update game timers
 	current_time = pygame.time.get_ticks()
 	for timer in timers:
 		elapsed_time = timer.get_elapsed_time(current_time)
@@ -37,31 +58,32 @@ def update_game(settings, obstacles, player, collisions, display_box, timers):
 			timer.paused = True
 		else:
 			timer.paused = False
-	
+
+	#Update game obstacles
 	for obstacle in obstacles:
-		#Updating the obstacle will move it if it is a dynamic obstacle
+		#Updating the obstacle will move if it is a dynamic obstacle
+		#if not settings.game_paused:
 		obstacle.update()
+
 
 		#Functionality for obstacles that can interact with the player
 		if obstacle.interactable == True:
 			if player_collision.rect.colliderect(obstacle.rect):
 				if (obstacle.side_interactable and player.direction == obstacle.interaction_side) or not obstacle.side_interactable:
 						player.ready_for_interaction = True
-						display_box.message_key = obstacle.interaction_message
 						interaction_obstacle = obstacle
 				break
 	return interaction_obstacle
 	
 
-	
-def update_player(settings, screen, player, display_box, golden_map_tile, map_entities):
+def update_player(settings, screen, player, display_box, golden_map_tile, map_entities, static_map_entities):
 	if not settings.game_paused:	
 		if player.finishing_animation:
 			player.finish_animation()
 
 		player.check_collisions()
 		if player.colliding:
-			for ent in map_entities:
+			for ent in static_map_entities:
 				ent.x = player.round_to_tileset(ent.x)
 				ent.y = player.round_to_tileset(ent.y)
 			if player.move_in_progress:
@@ -75,11 +97,8 @@ def update_player(settings, screen, player, display_box, golden_map_tile, map_en
 					player.face_down()
 			player.finishing_animation = False
 			player.colliding = False
-
 		
-
 		else:	
-			#print(golden_map_tile.x)
 			#standard player movement to respond to player movement flags set in the event loop
 			if player.move_in_progress:
 				if player.colliding == False:
@@ -114,48 +133,42 @@ def update_player(settings, screen, player, display_box, golden_map_tile, map_en
 							player.map_moving = True
 						else:
 							player.move_down()
-							player.map_moving = False
-			
+							player.map_moving = False			
 
 
-def draw_display(settings, screen, player, level_map, display_box, map_entities):
-	screen.fill()
-	#level_map.blitme()
-	for entity in map_entities:
-		entity.blitme()
-	player.blitme()
-
-	if display_box.visible == True:
-		display_box.blitme()
-
-def generate_obstacles(settings, screen, level_map, obstacles):
+def generate_obstacles(settings, screen, level_map, obstacles, static_map_entities):
 	new_desk = Desk(settings.tile_size*16, settings.tile_size*8, settings, screen, level_map)
 	obstacles.add(new_desk)
+	static_map_entities.add(new_desk)
 	coffee_machine = CoffeeMachine(settings.tile_size*4, settings.tile_size*3, settings, screen, level_map)
 	obstacles.add(coffee_machine)
+	static_map_entities.add(coffee_machine)
 
 
-def build_map(settings, screen, level_map, obstacles, map_entities):
+def build_map(settings, screen, level_map, obstacles, map_entities, static_map_entities):
 	#For the given map recognize obstacles within the map image and add a obstacle object at its x and y location
 	for y in range(0, level_map.rect.height, settings.tile_size):
 		for x in range(0, level_map.rect.width, settings.tile_size):
-			tile_key1 = level_map.image.get_at((x, y))
-			#tile_key2 = level_map.image.get_at((x+1, y))
-			#tile_key3 = level_map.image.get_at((x+2, y))
-			#tile_key4 = level_map.image.get_at((x, y+1))
-			#tile_key5 = level_map.image.get_at((x+1, y+1))
-			#tile_key6 = level_map.image.get_at((x+2, y+1))
-			#tile_key7 = level_map.image.get_at((x, y+3))
-			#tile_key8 = level_map.image.get_at((x+1, y+3))
-			#tile_key8 = level_map.image.get_at((x+2, y+3))
+			tile_key1 = level_map.image.get_at((x+3, y+17))
+			tile_key2 = level_map.image.get_at((x+6, y+10))
+			tile_key3 = level_map.image.get_at((x+22, y+5))
+			tile_key4 = level_map.image.get_at((x+25, y+13))
+			tile_key5 = level_map.image.get_at((x+30, y+4))
+
+			tile_key =[]
+			tile_key.append(tile_key1)
+			tile_key.append(tile_key2)
+			tile_key.append(tile_key3)
+			tile_key.append(tile_key4)
+			tile_key.append(tile_key5)
 
 			for tile in images.obstacle_tiles:
-				if  tile == tile_key1:
+				if  tile == tile_key:
 					wall = Wall(x, y, settings, screen, level_map)
 					obstacles.add(wall)
+					static_map_entities.add(wall)
 			for tile in images.background_tiles:	
-				if  tile == tile_key1:
+				if  tile == tile_key:
 					carpet = Carpet(x, y, settings, screen)
 					map_entities.add(carpet)
-
-
+					static_map_entities.add(carpet)

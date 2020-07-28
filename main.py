@@ -33,39 +33,39 @@ def run_game():
 	display_box = DisplayBox(settings, screen)
 	
 	#Create Groups
-	#obstacles is a group for all obstacles besides the player
-	obstacles = Group()
-	#collisions is a group for all collideable obstacles including the player
-	collisions = Group()
-	#items is a group for all items the player can interact with
-	items = Group()
-	#map_entities is a group for all obstacles, NPCs, items and background tiles that make up the map
-	map_entities = Group()
-	#timers is a group for all timers and clocks
 	timers = Group()
+	items = Group()
+	static_map_entities = Group()
+	npcs = Group()
+	obstacles = Group()
+	collisions = Group()
+	map_entities = Group()
+	on_screen_entities = Group()
 
 	#Build map and objects
+	screen.fill()
 	level_map = LevelMap(settings, screen)
-	gf.generate_obstacles(settings, screen, level_map, obstacles)
-	gf.update_screen(settings, screen, display_box, level_map)
-	gf.build_map(settings, screen, level_map, obstacles, map_entities)
+	gf.generate_obstacles(settings, screen, level_map, obstacles, static_map_entities)
+	gf.build_map(settings, screen, level_map, obstacles, map_entities, static_map_entities)
 	golden_map_tile = GoldenMapTile(0, 0, settings, screen)
 
-	#set map to background only:
-
-	#variables for positioning items on the screen
+	#Variable for positioning items on the screen
 	tile_unit = settings.tile_size
 
 	report = Item(tile_unit*7, tile_unit*3, settings, screen, level_map)
 	report2 = Item(tile_unit*9, tile_unit*3, settings, screen, level_map)
 
-	player = Player(tile_unit*7, tile_unit*7, settings, screen, level_map, collisions, display_box, obstacles, map_entities, golden_map_tile)
+	player = Player(tile_unit*4, tile_unit*5, settings, screen, level_map, collisions, obstacles, map_entities, static_map_entities, golden_map_tile)
 	girl = NPC_Still(tile_unit*16, tile_unit*3, settings, screen, level_map, collisions, 50, 20)
-	boy = NPC_Still(tile_unit*5, tile_unit*5, settings, screen, level_map, collisions, 50, 20)
+	boy = NPC_Still(tile_unit*5, tile_unit*6, settings, screen, level_map, collisions, 50, 20)
+	
+	npcs.add(boy)
+	npcs.add(girl)
 	items.add(report)
 	items.add(report2)
-	obstacles.add(boy)
-	obstacles.add(girl)
+	static_map_entities.add(items)
+	static_map_entities.add(golden_map_tile)
+	obstacles.add(npcs)
 	obstacles.add(items)
 	map_entities.add(obstacles)
 	map_entities.add(golden_map_tile)
@@ -83,9 +83,7 @@ def run_game():
 
 	#Run main game loop
 	while True:
-		#print(player.x)
-		#print("\t" + str(golden_map_tile.x))
-		clock.tick_busy_loop(30)
+		clock.tick_busy_loop(settings.framerate)
 
 		event.event_loop(settings, screen, player, main_menu, display_box, obstacles, map_entities, collisions, interaction_obstacle, timers)
 
@@ -98,8 +96,8 @@ def run_game():
 
 		elif settings.game_state == "run":	
 			interaction_obstacle = gf.update_game(settings, obstacles, player, collisions, display_box, timers)
-			gf.update_player(settings, screen, player, display_box, golden_map_tile, map_entities)
-			gf.draw_display(settings, screen, player, level_map, display_box, map_entities)
+			gf.update_player(settings, screen, player, display_box, golden_map_tile, map_entities, static_map_entities)
+			gf.draw_display(settings, screen, player, level_map, display_box, map_entities, on_screen_entities, npcs)
 
 		gf.update_display()
 

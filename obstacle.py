@@ -13,7 +13,6 @@ class Obstacle(MapEntity):
 		self.screen = screen
 		self.level_map = level_map
 
-		
 		#Static Logic Attributes
 		#can the obstacle interact with the player
 		self.interactable = False
@@ -24,12 +23,18 @@ class Obstacle(MapEntity):
 		self.pickupable = False
 		#flag for if the obstacle is an NPC
 		self.is_NPC = False 
-		#the message displayed when interacted with
-		self.interaction_message = None
 		#flag for if the obstacle modifies the player's attributes
 		self.player_modifier = False
+		#variables for the display box associated to that obstacle
+		self.interaction_message = ""
+		self.message_type = "default"
+		self.response_options = ["Yes", "No"]
 
 	def update(self):
+		pass
+	def modify_player(self, player):
+		pass
+	def revert_player(self, player):
 		pass
 	
 '''
@@ -54,8 +59,8 @@ class Item(StaticObstacle):
 
 		#Logic Attributes
 		self.interactable = True
-		self.interaction_message = 'item_report_1'
 		self.pickupable = True
+		self.interaction_message = 'item_report_1'
 
 
 class Desk(StaticObstacle):
@@ -69,8 +74,8 @@ class Desk(StaticObstacle):
 		#Logic Attriutes
 		self.interactable = True
 		self.side_interactable = True
-		self.interaction_message = 'desk'
 		self.interaction_side = "up"
+		self.interaction_message = 'desk'
 
 
 class CoffeeMachine(StaticObstacle):
@@ -84,10 +89,10 @@ class CoffeeMachine(StaticObstacle):
 		#Logic Attriutes
 		self.interactable = True
 		self.side_interactable = True
-		self.interaction_message = 'coffee_machine'
-		self.interaction_side = "up"
 		self.player_modifier = True
 		self.player_modifier_duration = 8.0
+		self.interaction_message = 'coffee_machine'
+		self.interaction_side = "up"
 
 	def modify_player(self, player):
 		self.player = player
@@ -136,7 +141,7 @@ class DynamicObstacle(Obstacle):
 
 		#Attribute that should only be true for the player, but must be defined for all Dynamic Obstacles
 		self.map_moving = False
-
+		
 		self.image_left = [pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),
 		pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left2.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left2.png'),
 		pygame.image.load('.\\Images\\Player\\Walk_Left\\left2.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left3.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left3.png'),
@@ -238,10 +243,13 @@ class DynamicObstacle(Obstacle):
 	
 	def finish_animation(self):
 		#Finish the animation for all movements. Only run after a keyup ends the player movement. Also handles finishing animation after a collision.
+		self.x_round = self.settings.tile_size * round(self.x / self.settings.tile_size)
+		self.y_round = self.settings.tile_size * round(self.y / self.settings.tile_size)
 		if self.direction == "right" or self.direction == "left":
-			if (((self.x + self.speed) % self.settings.tile_size) < (self.x  % self.settings.tile_size) or ((self.x - self.speed) % self.settings.tile_size) > (self.x  % self.settings.tile_size)) or self.x % self.settings.tile_size == 0:
-				self.x = self.settings.tile_size * round(self.x / self.settings.tile_size)
+			if abs(self.x - self.x_round) <= self.speed:
+				self.x = self.x_round
 				self.finishing_animation = False
+				self.staying_still = True
 			else:
 				if self.direction == "right":
 					self.move_right()
@@ -249,19 +257,15 @@ class DynamicObstacle(Obstacle):
 					self.move_left()
 		
 		elif self.direction == "up" or self.direction == "down":
-			if (((self.y + self.speed) % self.settings.tile_size) < (self.y % self.settings.tile_size) or ((self.y - self.speed) % self.settings.tile_size) > (self.y  % self.settings.tile_size)) or self.y % self.settings.tile_size == 0:
-				self.y = self.settings.tile_size * round(self.y / self.settings.tile_size)
+			if abs(self.y - self.y_round) <= self.speed:
+				self.y = self.y_round
 				self.finishing_animation = False
+				self.staying_still = True
 			else:
 				if self.direction == "up":
 					self.move_up()
 				elif self.direction == "down":
 					self.move_down()
-
-		else:
-			self.finishing_animation = False
-
-
 '''
 **************************************************************************************************************************************************************************
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -279,6 +283,12 @@ class Character(DynamicObstacle):
 		self.image_x = self.x 
 		self.image_y = self.y - self.settings.tile_size + 10
 		self.screen.display.blit(self.image, (self.image_x, self.image_y))
+		#self.screen.display.blit(self.image, (self.rect.x, self.rect.y))
+
+	def round_to_tileset(self, value_to_round):
+		self.value_to_round = value_to_round
+		return self.settings.tile_size * round(self.value_to_round / self.settings.tile_size)
+
 
 class NPC(Character):
 	def __init__(self, x, y, settings, screen, level_map, collisions, move_width, move_height):
@@ -308,7 +318,9 @@ class NPC(Character):
 		self.interactable = True
 		self.interactable = True
 		self.is_NPC = True
+		self.needs_response = True
 		self.interaction_message = 'NPC_girl'
+		self.message_type = "responsive"
 
 	def face_player(self, player_direction):
 		self.player_direction = player_direction
@@ -330,8 +342,6 @@ class NPC(Character):
 
 		self.still_count = 0
 
-
-
 	def change_direction(self):
 		x = {"right": 0 ,"up":1, "left":2, "down":3}
 		num = random.choice([1,3])
@@ -340,7 +350,6 @@ class NPC(Character):
 		val_list = list(x.values()) 
 		self.direction = key_list[val_list.index(num)]
 
-
 	def movement(self):
 		rand_num = random.randint(1,100)
 		
@@ -348,40 +357,37 @@ class NPC(Character):
 		#if self.x <= self.left_wall or self.x >= self.right_wall or self.y <= self.top_wall or self.y >= self.bottom_wall:
 			#self.change_direction()
 
-		self.still_count += 1
 		self.check_collisions()
+		
+		if self.colliding:
+			self.x = self.round_to_tileset(self.x)
+			self.y = self.round_to_tileset(self.y)
+			self.change_direction()
 
-		if not self.staying_still or self.still_count >15:
-			if self.finishing_animation:
-				self.finish_animation()
-				self.move_in_progress = False
+		elif self.finishing_animation and not self.staying_still:
+			self.finish_animation()
+		
+		elif rand_num <3 and not self.staying_still:
+			self.finishing_animation = True
 
-			# % chance to stay still
-			elif rand_num < 3:
-				self.staying_still = True
-				self.change_direction()
-				self.still_count = 0
+		elif self.staying_still and self.still_count <15:
+			self.still_count +=1
 
-			#% chance to stay still
-			#elif rand_num <= 95:
-			else:
-				self.move_in_progress = True
-				#standard player movement to respond to player movement flags set in the event loop
-				if self.direction == "right":
-					self.move_right()
-				elif self.direction == "left":
-					self.move_left()		
-				elif self.direction == "up":
-					self.move_up()		
-				elif self.direction == "down":
-					self.move_down()
-				
-				self.finishing_animation = False
+		elif self.staying_still and self.still_count >=15:
+			self.staying_still = False
+			self.still_count = 0
+			self.change_direction()
 
-			#Chance to change direction
-			#else:
-			#	self.change_direction()
-			#	self.finishing_animation = True
+		else:
+			#standard player movement to respond to player movement flags set in the event loop
+			if self.direction == "right":
+				self.move_right()
+			elif self.direction == "left":
+				self.move_left()		
+			elif self.direction == "up":
+				self.move_up()		
+			elif self.direction == "down":
+				self.move_down()
 
 
 class NPC_Still(NPC):
