@@ -39,6 +39,7 @@ def draw_display(settings, screen, player, level_map, display_box, map_entities,
 
 	if display_box.visible == True:
 		display_box.blitme()
+		print(display_box.main_message_done)
 
 def update_game(settings, obstacles, player, collisions, display_box, timers):
 	#Update obstacles and timers
@@ -64,7 +65,6 @@ def update_game(settings, obstacles, player, collisions, display_box, timers):
 		#Updating the obstacle will move if it is a dynamic obstacle
 		#if not settings.game_paused:
 		obstacle.update()
-
 
 		#Functionality for obstacles that can interact with the player
 		if obstacle.interactable == True:

@@ -29,6 +29,7 @@ class Obstacle(MapEntity):
 		self.interaction_message = ""
 		self.message_type = "default"
 		self.response_options = ["Yes", "No"]
+		self.response_messages =["A", "B"]
 
 	def update(self):
 		pass
@@ -396,6 +397,9 @@ class NPC_Still(NPC):
 
 		self.image = pygame.image.load('.\\Images\\Player\\player_test.png')
 		self.rect = self.image.get_rect()
+
+		self.response_messages =["Wow, you know so much about your colleagues! ; Let's be friends on BitLinked.", "Wow, you are so out of touch with your coworkers. ; Come back and talk to me later when you start caring."]
+
 
 	def movement(self):
 		rand_num = random.randint(1,100)

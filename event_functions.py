@@ -45,22 +45,30 @@ def keydown(event, settings, screen, player, menu, display_box, obstacles, map_e
 			elif event.key == pygame.K_DOWN:
 				player.moving_down = player.move_in_progress = True
 				player.direction = "down"
-	
-	#All other intraction key presses
+	else:
+		if event.key == pygame.K_UP:
+			display_box.up_press = True
+			display_box.down_press = False
+		elif event.key == pygame.K_DOWN:
+			display_box.down_press = True
+			display_box.up_press = False
 
+
+	#All other intraction key presses
 	#Events with Action button
 	if event.key == pygame.K_a: 
 		if settings.game_paused == True and settings.game_state == "run":
 			if display_box.main_message_done == False:
-				#if display_box.typing == True:
-					#pass
-				#else:
-				if display_box.clear_on_click == True:
-					display_box.clear_lines()
+				if display_box.typing == True:
+					#don't switch or clear lines while typing
+					pass
 				else:
-					display_box.switch_lines()
-			elif display_box.message_sequence_done == False:
-				pass
+					if display_box.clear_on_click == True:
+						display_box.clear_lines()
+					else:
+						display_box.switch_lines()
+			elif display_box.main_message_done == True and display_box.message_sequence_done == False:
+				display_box.run_response()
 			#Close the displaybox
 			else:
 				display_box.visible = False
@@ -71,6 +79,7 @@ def keydown(event, settings, screen, player, menu, display_box, obstacles, map_e
 			display_box.message_key = interaction_obstacle.interaction_message
 			display_box.message_type = interaction_obstacle.message_type
 			display_box.response_options = interaction_obstacle.response_options
+			display_box.response_messages = interaction_obstacle.response_messages
 			display_box.visible = True
 			display_box.hold_blit = False
 			settings.game_paused = True

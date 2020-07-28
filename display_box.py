@@ -43,38 +43,54 @@ class DisplayBox():
 		self.visible = False
 		self.character_line_limit = 30
 		self.message_key = 'intro'
-		self.message_type = "informative"
+		self.message_type = "default"
 		self.response_options = ["Yes", "No"]
+		self.response_messages = ["A", "B"]
+
 		
 
 	def prep_message(self):
+		print("hi")
 		#Reset display box, and counters and prep it for displaying the message
 		self.message_to_write = self.messages.get(self.message_key)
 		self.word_list = self.message_to_write.split()
+		self.responses_number = len(self.response_options)
+		self.response_line = 1
+		self.reset_display_box_variables()
+		
+	def reset_display_box_variables(self):
+		self.clear_lines()
 		self.word_count = 0
 		self.char_count = 0
 		self.blit_count = 0
 		self.blit_count_counter = 0
 
-		self.line1 = ""
-		self.line2 = ""
-		self.line1_temp = ""
-		self.line2_temp = ""
-		self.line1_words_only = ""
-		self.line2_words_only = ""
-		self.current_active_line = 1
 		#States of the message being written
 		self.main_message_done = False
 		self.message_sequence_done = False
-		self.clear_on_click = False
 		self.typing = False
 		self.switching_lines = False
 		self.switching_lines_count = 0
 
+		#States of key preses for the display box
+		self.down_press = False
+		self.up_press = False
+
+	def clear_lines(self):
+		self.line1 = ""
+		self.line1_words_only = ""
+		self.line2 = ""	
+		self.line2_words_only = ""
+		self.line1_temp = ""
+		self.line2_temp = ""
+		self.current_active_line = 1
+		self.clear_on_click = False
+
 		
 	def blitme(self):
 		pygame.draw.rect(self.screen.display, self.color, self.rect)
-		self.char_pos = 0
+		#print(self.main_message_done)
+
 		if not self.main_message_done:
 			if self.switching_lines:
 				self.switching_lines_count +=1
@@ -113,8 +129,19 @@ class DisplayBox():
 					pygame.draw.rect(self.screen.display, self.color, self.rect_response)
 					self.blit_response()
 					self.blit_response_arrow()
+					if self.up_press:
+						if self.response_line == 1:
+							pass
+						else:
+							self.response_line -=1
+
+					if self.down_press:
+						if self.response_line == self.responses_number:
+							pass
+						else:
+							self.response_line +=1
 				else:
-					message_sequence_done = True
+					self.message_sequence_done = True
 
 		self.blit_lines()
 
@@ -168,13 +195,7 @@ class DisplayBox():
 			self.switching_lines = False
 		self.blit_lines()
 
-	def clear_lines(self):
-		self.line1 = ""
-		self.line1_words_only = ""
-		self.line2 = ""	
-		self.line2_words_only = ""
-		self.current_active_line = 1
-		self.clear_on_click = False
+
 
 	def blit_lines(self):
 		#blit line1 and line2 to the screen on the screen
@@ -219,7 +240,6 @@ class DisplayBox():
 		self.screen.display.blit(self.arrow_image, self.arrow_rect)
 
 	def blit_response(self):
-		self.responses_number = len(self.response_options)
 		self.option_count = 0
 		for opt in self.response_options:
 			self.option_count += 1
@@ -234,5 +254,13 @@ class DisplayBox():
 
 		self.arrow_rect = self.arrow_image.get_rect()
 		self.arrow_rect.left = self.rect_response.left + 5
-		self.arrow_rect.centery = self.rect_response.top + self.rect_response.height/3 
+		self.arrow_rect.centery = self.rect_response.top + self.rect_response.height/3 *self.response_line
 		self.screen.display.blit(self.arrow_image, self.arrow_rect)
+
+	def run_response(self):
+		self.reset_display_box_variables()
+		self.message_type = "default"
+		self.message_to_write = self.response_messages[self.response_line - 1]
+		self.word_list = self.message_to_write.split()
+
+
