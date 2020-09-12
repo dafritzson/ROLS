@@ -7,11 +7,14 @@ class DisplayBox():
 		self.settings = settings
 		self.screen = screen
 		
-		#Font settings
+		#font_main settings
 		self.text_color = (4,65,33)
-		self.font = pygame.font.SysFont('calibri', 20)
+		self.font_main = pygame.font.SysFont('Calibri', 20)
+		self.font_sub = pygame.font.SysFont('Calibri', 18)
 
 		self.color = (240, 240, 240)
+		self.color_scrollbar = (200, 10, 10)
+		self.color_scrollbar_inside = (100, 100, 100)
 
 		#Default display box locations
 		self.width = self.screen.rect.width
@@ -26,6 +29,8 @@ class DisplayBox():
 		self.response_top = self.screen.rect.bottom - self.settings.tile_size*5
 
 		self.rect_response = pygame.Rect(self.response_left , self.response_top, self.response_width, self.response_height)
+		self.rect_scrollbar = pygame.Rect(self.screen.rect.width - 14, self.response_top + 6, round(self.settings.tile_size/3) + 4 , self.response_height - 12)
+		
 
 		#Use the ";" character to indicate a break in the sentence. 
 		#All breaks will clear the display box and start displaying after the break
@@ -38,19 +43,16 @@ class DisplayBox():
 		}
 		self.message_to_write = "Hello the_Guy"
 
-
 		#Dynamic Attributes
 		self.visible = False
-		self.character_line_limit = 30
+		self.noise_on = False
+		self.character_line_limit = 42
 		self.message_key = 'intro'
 		self.message_type = "default"
 		self.response_options = ["Yes", "No"]
 		self.response_messages = ["A", "B"]
 
-		
-
 	def prep_message(self):
-		print("hi")
 		#Reset display box, and counters and prep it for displaying the message
 		self.message_to_write = self.messages.get(self.message_key)
 		self.word_list = self.message_to_write.split()
@@ -59,6 +61,7 @@ class DisplayBox():
 		self.reset_display_box_variables()
 		
 	def reset_display_box_variables(self):
+		self.noise_on = False
 		self.clear_lines()
 		self.word_count = 0
 		self.char_count = 0
@@ -86,10 +89,9 @@ class DisplayBox():
 		self.current_active_line = 1
 		self.clear_on_click = False
 
-		
 	def blitme(self):
 		pygame.draw.rect(self.screen.display, self.color, self.rect)
-		#print(self.main_message_done)
+		self.noise_on = False
 
 		if not self.main_message_done:
 			if self.switching_lines:
@@ -126,25 +128,26 @@ class DisplayBox():
 			#Trigger a response if it is a reponsive type message
 			if not self.message_sequence_done:
 				if self.message_type == "responsive":
-					pygame.draw.rect(self.screen.display, self.color, self.rect_response)
 					self.blit_response()
 					self.blit_response_arrow()
+					self.noise_on = True
 					if self.up_press:
 						if self.response_line == 1:
 							pass
 						else:
 							self.response_line -=1
+							self.up_press = False
 
 					if self.down_press:
 						if self.response_line == self.responses_number:
 							pass
 						else:
 							self.response_line +=1
+							self.down_press = False
 				else:
 					self.message_sequence_done = True
 
 		self.blit_lines()
-
 
 	def fill_line1(self):
 		if len(self.line1_words_only + self.current_word) <= self.character_line_limit:
@@ -195,29 +198,27 @@ class DisplayBox():
 			self.switching_lines = False
 		self.blit_lines()
 
-
-
 	def blit_lines(self):
 		#blit line1 and line2 to the screen on the screen
-		self.line1_image = self.font.render(self.line1, True, self.text_color, self.color)
+		self.line1_image = self.font_main.render(self.line1, True, self.text_color, self.color)
 		self.line1_rect = self.line1_image.get_rect()
 		self.line1_rect.left = self.rect.left + 5
 		self.line1_rect.centery = self.rect.centery - self.rect.height/5
 		self.screen.display.blit(self.line1_image, self.line1_rect)
 
-		self.line2_image = self.font.render(self.line2, True, self.text_color, self.color)
+		self.line2_image = self.font_main.render(self.line2, True, self.text_color, self.color)
 		self.line2_rect = self.line2_image.get_rect()
 		self.line2_rect.left = self.rect.left + 5
 		self.line2_rect.centery = self.rect.centery + self.rect.height/5
 		self.screen.display.blit(self.line2_image, self.line2_rect)
 
-		self.line1_temp_image = self.font.render(self.line1_temp, True, self.text_color, self.color)
+		self.line1_temp_image = self.font_main.render(self.line1_temp, True, self.text_color, self.color)
 		self.line1_temp_rect = self.line1_temp_image.get_rect()
 		self.line1_temp_rect.left = self.rect.left + 5
 		self.line1_temp_rect.centery = self.rect.centery - self.rect.height/3
 		self.screen.display.blit(self.line1_temp_image, self.line1_temp_rect)
 
-		self.line2_temp_image = self.font.render(self.line2_temp, True, self.text_color, self.color)
+		self.line2_temp_image = self.font_main.render(self.line2_temp, True, self.text_color, self.color)
 		self.line2_temp_rect = self.line2_temp_image.get_rect()
 		self.line2_temp_rect.left = self.rect.left + 5
 		self.line2_temp_rect.centery = self.rect.centery
@@ -225,6 +226,7 @@ class DisplayBox():
 
 		if not self.typing and self.main_message_done == False:
 			self.blit_next_arrow()	
+			self.noise_on = True
 
 	def blit_next_arrow(self):
 		self.arrow_images = [pygame.image.load('.\\Images\\Misc\\down_arrow.png'), pygame.image.load('.\\Images\\Misc\\down_arrow.png'), pygame.image.load('.\\Images\\Misc\\down_arrow2.png')]
@@ -240,24 +242,36 @@ class DisplayBox():
 		self.screen.display.blit(self.arrow_image, self.arrow_rect)
 
 	def blit_response(self):
+		pygame.draw.rect(self.screen.display, self.color, self.rect_response)
+
+		self.blit_response_scrollbar()
 		self.option_count = 0
 		for opt in self.response_options:
 			self.option_count += 1
-			self.line_image = self.font.render(opt, True, self.text_color, self.color)
+			self.line_image = self.font_sub.render(opt, True, self.text_color, self.color)
+			self.line_image_size = self.font_sub.size(opt)
 			self.line_rect = self.line_image.get_rect()
 			self.line_rect.left = self.rect_response.left + 20
-			self.line_rect.centery = self.rect_response.top + self.rect_response.height*self.option_count/3 
-			self.screen.display.blit(self.line_image, self.line_rect)
+			#self.line_rect.centery = self.rect_response.top + self.rect_response.height/3 * self.option_count - self.response_line*10
+			self.line_rect.centery = self.rect_response.top + self.line_image_size[1] * self.option_count - self.response_line*10
+			if self.rect_response.contains(self.line_rect):
+				self.screen.display.blit(self.line_image, self.line_rect)
 
 	def blit_response_arrow(self):
 		self.arrow_image = pygame.image.load('.\\Images\\Misc\\right_arrow.png')
-
 		self.arrow_rect = self.arrow_image.get_rect()
 		self.arrow_rect.left = self.rect_response.left + 5
-		self.arrow_rect.centery = self.rect_response.top + self.rect_response.height/3 *self.response_line
+		#self.arrow_rect.centery = self.rect_response.top + self.rect_response.height/3 * self.response_line - self.response_line*10
+		self.arrow_rect.centery = self.rect_response.top + self.line_image_size[1] * self.response_line - self.response_line*10
 		self.screen.display.blit(self.arrow_image, self.arrow_rect)
+		pygame.draw.rect(self.screen.display, self.color, self.rect)
 
-	def run_response(self):
+	def blit_response_scrollbar(self):
+		self.rect_scrollbar_inside = pygame.Rect(self.screen.rect.width - 11, self.response_top + 10, self.settings.tile_size/4 + 1, self.response_height - 50)
+		pygame.draw.rect(self.screen.display, self.color_scrollbar, self.rect_scrollbar)
+		pygame.draw.rect(self.screen.display, self.color_scrollbar_inside, self.rect_scrollbar_inside)
+
+	def run_responsive_message(self):
 		self.reset_display_box_variables()
 		self.message_type = "default"
 		self.message_to_write = self.response_messages[self.response_line - 1]

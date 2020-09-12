@@ -2,20 +2,21 @@ import sys
 from time import sleep
 import pygame
 import game_functions as gf
+import audio_mixer as am
 from timer import Timer
 
 
-pygame.mixer.init()
-item_sound = pygame.mixer.music.load('.\\Audio\\Item.wav')
+
+
 '''All Event functions will be handled in this file'''
-def event_loop(settings, screen, player, menu, display_box, obstacles, map_entities, collisions, interaction_obstacle, timers):
+def event_loop(settings, screen, player, menu, display_box, map_entities, overlay_map_entities, collisions, interaction_obstacle, timers, items):
 	'''check for all event types'''
 	event_list = pygame.event.get()
 	for event in event_list:
 		if event.type == pygame.QUIT:
 			sys.exit()
 		elif event.type == pygame.KEYDOWN:
-			keydown(event, settings, screen, player, menu, display_box, obstacles, map_entities, collisions, interaction_obstacle, timers)
+			keydown(event, settings, screen, player, menu, display_box, map_entities, overlay_map_entities, collisions, interaction_obstacle, timers, items)
 		elif event.type == pygame.KEYUP:
 			keyup(event, settings, player)
 		elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -23,7 +24,7 @@ def event_loop(settings, screen, player, menu, display_box, obstacles, map_entit
 			mouse_click(settings, screen, player, menu, mouse_x, mouse_y)
 
 
-def keydown(event, settings, screen, player, menu, display_box, obstacles, map_entities, collisions, interaction_obstacle, timers):
+def keydown(event, settings, screen, player, menu, display_box, map_entities, overlay_map_entities, collisions, interaction_obstacle, timers, items):
 	'''check for all keydowns'''
 	#If the player is alrady moving, reject the new movement direction and add that event back to the queue to process later
 	if settings.game_paused == False:
@@ -58,6 +59,8 @@ def keydown(event, settings, screen, player, menu, display_box, obstacles, map_e
 	#Events with Action button
 	if event.key == pygame.K_a: 
 		if settings.game_paused == True and settings.game_state == "run":
+			if display_box.noise_on:
+				am.play_sound('sound_display_box')
 			if display_box.main_message_done == False:
 				if display_box.typing == True:
 					#don't switch or clear lines while typing
@@ -68,9 +71,10 @@ def keydown(event, settings, screen, player, menu, display_box, obstacles, map_e
 					else:
 						display_box.switch_lines()
 			elif display_box.main_message_done == True and display_box.message_sequence_done == False:
-				display_box.run_response()
+				display_box.run_responsive_message()
 			#Close the displaybox
 			else:
+				display_box.clear_lines()
 				display_box.visible = False
 				settings.game_paused = False
 
@@ -81,15 +85,16 @@ def keydown(event, settings, screen, player, menu, display_box, obstacles, map_e
 			display_box.response_options = interaction_obstacle.response_options
 			display_box.response_messages = interaction_obstacle.response_messages
 			display_box.visible = True
-			display_box.hold_blit = False
 			settings.game_paused = True
 			display_box.prep_message()
 
 			if interaction_obstacle.pickupable:
-				pygame.mixer.music.play()
-				obstacles.remove(interaction_obstacle)
+				am.play_sound('sound_report')
+				#obstacles.remove(interaction_obstacle)
+				overlay_map_entities.remove(interaction_obstacle)
 				map_entities.remove(interaction_obstacle)
 				collisions.remove(interaction_obstacle)
+				items.remove(interaction_obstacle)
 				player.report_count += 1
 
 			if interaction_obstacle.is_NPC:
@@ -135,12 +140,14 @@ def mouse_click(settings, screen, player, menu, mouse_x, mouse_y):
 		button_clicked = menu.newgame_rect.collidepoint(mouse_x, mouse_y)
 		if button_clicked:
 			settings.game_state = "run"
+			am.play_music('main_theme')
 			#hide the mouse
 			pygame.mouse.set_visible(False)
 	if settings.game_state == "game menu":
 		button_clicked = menu.continuegame_rect.collidepoint(mouse_x, mouse_y)
 		if button_clicked:
 			settings.game_state = "run"
+			am.play_music('main_theme')
 			#hide the mouse
 			pygame.mouse.set_visible(False)
 

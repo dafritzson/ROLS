@@ -17,7 +17,7 @@ def run_menu(settings, screen, player, menu):
 	menu.blitme()
 
 
-def draw_display(settings, screen, player, level_map, display_box, map_entities, on_screen_entities, npcs):
+def draw_display(settings, screen, player, level_map, display_box, map_entities, base_map_entities, overlay_map_entities, on_screen_entities, npcs, items):
 	'''
 	#try to save memory by not drawing off screen entities
 	for entity in map_entities:
@@ -27,8 +27,15 @@ def draw_display(settings, screen, player, level_map, display_box, map_entities,
 		else:
 			on_screen_entities.add(entity)
 	'''		
+	player.blitme()
+
 	screen.fill()
-	for entity in map_entities:
+	for entity in base_map_entities:
+		entity.blitme()
+
+	level_map.blit_overlay()
+
+	for entity in overlay_map_entities:
 		entity.blitme()
 
 	#Draw NPC on top of player if it is below it
@@ -39,9 +46,9 @@ def draw_display(settings, screen, player, level_map, display_box, map_entities,
 
 	if display_box.visible == True:
 		display_box.blitme()
-		print(display_box.main_message_done)
 
-def update_game(settings, obstacles, player, collisions, display_box, timers):
+
+def update_game(settings, player, collisions, display_box, timers):
 	#Update obstacles and timers
 	player.ready_for_interaction = False
 	
@@ -61,9 +68,8 @@ def update_game(settings, obstacles, player, collisions, display_box, timers):
 			timer.paused = False
 
 	#Update game obstacles
-	for obstacle in obstacles:
+	for obstacle in collisions:
 		#Updating the obstacle will move if it is a dynamic obstacle
-		#if not settings.game_paused:
 		obstacle.update()
 
 		#Functionality for obstacles that can interact with the player
@@ -76,16 +82,18 @@ def update_game(settings, obstacles, player, collisions, display_box, timers):
 	return interaction_obstacle
 	
 
-def update_player(settings, screen, player, display_box, golden_map_tile, map_entities, static_map_entities):
+def update_player(settings, screen, player, display_box, golden_map_tile, map_entities, overlay_map_entities, level_map):
 	if not settings.game_paused:	
 		if player.finishing_animation:
 			player.finish_animation()
 
 		player.check_collisions()
 		if player.colliding:
-			for ent in static_map_entities:
-				ent.x = player.round_to_tileset(ent.x)
-				ent.y = player.round_to_tileset(ent.y)
+			#Round player/map when colliding and make sure all elements are alligned
+			player.finishing_animation = True
+			player.finish_animation()
+			
+			#Set the player direction
 			if player.move_in_progress:
 				if player.moving_right:
 					player.face_right()
@@ -103,7 +111,7 @@ def update_player(settings, screen, player, display_box, golden_map_tile, map_en
 			if player.move_in_progress:
 				if player.colliding == False:
 					if player.moving_right and player.rect.right < screen.rect.right:
-						if player.x >= screen.rect.right - settings.tile_size*20:
+						if player.x >= screen.rect.right - settings.tile_size*6:
 							player.animate_right()
 							player.move_map_right()
 							player.map_moving = True
@@ -111,7 +119,7 @@ def update_player(settings, screen, player, display_box, golden_map_tile, map_en
 							player.move_right()
 							player.map_moving = False
 					elif player.moving_left and player.rect.left > screen.rect.left:
-						if player.x <= screen.rect.left + settings.tile_size*20:
+						if player.x <= screen.rect.left + settings.tile_size*6:
 							player.animate_left()
 							player.move_map_left()
 							player.map_moving = True
@@ -119,7 +127,7 @@ def update_player(settings, screen, player, display_box, golden_map_tile, map_en
 							player.move_left()
 							player.map_moving = False	
 					elif player.moving_up and player.rect.top > screen.rect.top:
-						if player.y <= screen.rect.top + settings.tile_size*20:
+						if player.y <= screen.rect.top + settings.tile_size*6:
 							player.animate_up()
 							player.move_map_up()
 							player.map_moving = True
@@ -127,7 +135,7 @@ def update_player(settings, screen, player, display_box, golden_map_tile, map_en
 							player.move_up()
 							player.map_moving = False		
 					elif player.moving_down and player.rect.bottom < screen.rect.bottom:
-						if player.y > screen.rect.bottom - settings.tile_size*20:
+						if player.y > screen.rect.bottom - settings.tile_size*6:
 							player.animate_down()
 							player.move_map_down()
 							player.map_moving = True
@@ -136,39 +144,38 @@ def update_player(settings, screen, player, display_box, golden_map_tile, map_en
 							player.map_moving = False			
 
 
-def generate_obstacles(settings, screen, level_map, obstacles, static_map_entities):
+def generate_obstacles(settings, screen, level_map, collisions, overlay_map_entities):
 	new_desk = Desk(settings.tile_size*16, settings.tile_size*8, settings, screen, level_map)
-	obstacles.add(new_desk)
-	static_map_entities.add(new_desk)
-	coffee_machine = CoffeeMachine(settings.tile_size*4, settings.tile_size*3, settings, screen, level_map)
-	obstacles.add(coffee_machine)
-	static_map_entities.add(coffee_machine)
+	collisions.add(new_desk)
+	overlay_map_entities.add(new_desk)
+	coffee_machine = CoffeeMachine(settings.tile_size*4, settings.tile_size*2, settings, screen, level_map)
+	collisions.add(coffee_machine)
+	overlay_map_entities.add(coffee_machine)
 
 
-def build_map(settings, screen, level_map, obstacles, map_entities, static_map_entities):
+def build_map(settings, screen, level_map, collisions, base_map_entities):
 	#For the given map recognize obstacles within the map image and add a obstacle object at its x and y location
 	for y in range(0, level_map.rect.height, settings.tile_size):
 		for x in range(0, level_map.rect.width, settings.tile_size):
-			tile_key1 = level_map.image.get_at((x+3, y+17))
-			tile_key2 = level_map.image.get_at((x+6, y+10))
-			tile_key3 = level_map.image.get_at((x+22, y+5))
-			tile_key4 = level_map.image.get_at((x+25, y+13))
-			tile_key5 = level_map.image.get_at((x+30, y+4))
-
-			tile_key =[]
-			tile_key.append(tile_key1)
-			tile_key.append(tile_key2)
-			tile_key.append(tile_key3)
-			tile_key.append(tile_key4)
-			tile_key.append(tile_key5)
+			tile_key = level_map.image.get_at((x, y))
 
 			for tile in images.obstacle_tiles:
 				if  tile == tile_key:
 					wall = Wall(x, y, settings, screen, level_map)
-					obstacles.add(wall)
-					static_map_entities.add(wall)
+					collisions.add(wall)
+					base_map_entities.add(wall)
+			'''
 			for tile in images.background_tiles:	
 				if  tile == tile_key:
 					carpet = Carpet(x, y, settings, screen)
-					map_entities.add(carpet)
-					static_map_entities.add(carpet)
+					base_map_entities.add(carpet)
+			'''
+
+def set_map_position(settings, screen, level_map, map_entities):
+	level_map.rect_overlay.x = level_map.rect_overlay.x + settings.tile_size*-12
+	level_map.rect_overlay.y =  level_map.rect_overlay.y + settings.tile_size*-33
+
+	for ent in map_entities:
+		ent.x = ent.x + settings.tile_size*-12
+		ent.y = ent.y + settings.tile_size*-33
+

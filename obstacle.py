@@ -1,5 +1,6 @@
 import random
 import pygame
+import math
 from pygame.sprite import Sprite
 from map_entity import MapEntity
 from collision_sprite import CollisionSprite
@@ -28,7 +29,7 @@ class Obstacle(MapEntity):
 		#variables for the display box associated to that obstacle
 		self.interaction_message = ""
 		self.message_type = "default"
-		self.response_options = ["Yes", "No"]
+		self.response_options = ["A","Yes", "No"]
 		self.response_messages =["A", "B"]
 
 	def update(self):
@@ -91,13 +92,13 @@ class CoffeeMachine(StaticObstacle):
 		self.interactable = True
 		self.side_interactable = True
 		self.player_modifier = True
-		self.player_modifier_duration = 8.0
+		self.player_modifier_duration = 30
 		self.interaction_message = 'coffee_machine'
 		self.interaction_side = "up"
 
 	def modify_player(self, player):
 		self.player = player
-		self.player.speed = 4
+		self.player.speed = 5
 
 	def revert_player(self, player):
 		self.player = player
@@ -124,11 +125,11 @@ class DynamicObstacle(Obstacle):
 		#Flaf for when the player is moving with the downkeys
 		self.move_in_progress = False
 		#the direction the player is facing
-		self.direction = "down"
+		self.direction = "right"
 		#forwards and backwards speeds
 		self.speed = 2
 		#counts for forwards and backwards animation
-		self.animation_count_f = 0
+		self.animation_count = 0
 		self.animation_count_b = 0
 		#flag for when the player is automatically finishing their animation to land on the correct pixel
 		self.finishing_animation = False
@@ -172,12 +173,23 @@ class DynamicObstacle(Obstacle):
 		self.image_up = [pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png')]
 		self.image_down = [pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png'),pygame.image.load('.\\Images\\Player\\player_test.png')]
 		'''
-
+		
 	def update(self):
-		self.movement()
+		if not self.settings.game_paused:
+			self.movement()
 
 	def movement(self):
 		pass
+
+	def update_animation_count(self):
+		if self.direction == "right":
+			self.image = self.image_right[self.animation_count % 12]
+		elif self.direction == "left":
+			self.image = self.image_left[self.animation_count % 12]
+		elif self.direction == "up":
+			self.image = self.image_up[self.animation_count % 12]
+		else:
+			self.image = self.image_down[self.animation_count % 12]
 
 	def face_right(self):
 		self.image = self.image_right[0]
@@ -198,35 +210,35 @@ class DynamicObstacle(Obstacle):
 	#Functions to move the Dynamic Obstacle in different directions with corresponding animation
 	def move_right(self):
 		self.x = self.x + self.speed
-		self.image = self.image_right[self.animation_count_f % 12]
-		self.animation_count_f += 1
+		self.image = self.image_right[self.animation_count % 12]
+		self.animation_count += 1
 		self.direction = "right"
 
 	def move_left(self):
 		self.x = self.x - self.speed
-		self.image = self.image_left[self.animation_count_f % 12]
-		self.animation_count_f += 1
+		self.image = self.image_left[self.animation_count % 12]
+		self.animation_count += 1
 		self.direction = "left"
 
 	def move_up(self):
 		self.y = self.y - self.speed
-		self.image = self.image_up[self.animation_count_f % 12]
-		self.animation_count_f += 1
+		self.image = self.image_up[self.animation_count % 12]
+		self.animation_count += 1
 		self.direction = "up"
 
 	def move_down(self):
 		self.y = self.y + self.speed
-		self.image = self.image_down[self.animation_count_f % 12]
-		self.animation_count_f += 1
+		self.image = self.image_down[self.animation_count % 12]
+		self.animation_count += 1
 		self.direction = "down"
 
 	def check_collisions(self):
 		#If player collides with an object rectangle, stop the player from moving in that direction
 		self.collisions.remove(self)
 		self.collision_sprite = self.get_collision_rect()
-		
 		if  pygame.sprite.spritecollide(self.collision_sprite, self.collisions, False):
 			self.colliding = True
+			self.animation_count = 0
 		else:
 			self.colliding = False
 		self.collisions.add(self)
@@ -242,10 +254,33 @@ class DynamicObstacle(Obstacle):
 			self.collision_sprite = CollisionSprite(self.x, self.y + self.speed)
 		return self.collision_sprite
 	
+
+
+'''
+**************************************************************************************************************************************************************************
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+**************************************************************************************************************************************************************************
+'''
+class Character(DynamicObstacle):
+	def __init__(self, x, y, settings, screen, level_map, collisions):
+		super().__init__(x, y, settings, screen, level_map, collisions)
+
+	def blitme(self):
+		self.rect.x = self.x
+		self.rect.y = self.y
+
+		self.update_animation_count()
+
+		self.image_x = self.x 
+		#offset the y so the image of the player stands closer to the middle of the tile
+		self.image_y = self.y - self.settings.tile_size + 10
+		self.screen.display.blit(self.image, (self.image_x, self.image_y))
+
 	def finish_animation(self):
 		#Finish the animation for all movements. Only run after a keyup ends the player movement. Also handles finishing animation after a collision.
-		self.x_round = self.settings.tile_size * round(self.x / self.settings.tile_size)
-		self.y_round = self.settings.tile_size * round(self.y / self.settings.tile_size)
+		self.x_round = self.settings.tile_size * self.round(self.x / self.settings.tile_size)
+		self.y_round = self.settings.tile_size * self.round(self.y / self.settings.tile_size)
 		if self.direction == "right" or self.direction == "left":
 			if abs(self.x - self.x_round) <= self.speed:
 				self.x = self.x_round
@@ -267,28 +302,18 @@ class DynamicObstacle(Obstacle):
 					self.move_up()
 				elif self.direction == "down":
 					self.move_down()
-'''
-**************************************************************************************************************************************************************************
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-**************************************************************************************************************************************************************************
-'''
-class Character(DynamicObstacle):
-	def __init__(self, x, y, settings, screen, level_map, collisions):
-		super().__init__(x, y, settings, screen, level_map, collisions)
-
-	def blitme(self):
-		self.rect.x = self.x
-		self.rect.y = self.y
-
-		self.image_x = self.x 
-		self.image_y = self.y - self.settings.tile_size + 10
-		self.screen.display.blit(self.image, (self.image_x, self.image_y))
-		#self.screen.display.blit(self.image, (self.rect.x, self.rect.y))
-
-	def round_to_tileset(self, value_to_round):
-		self.value_to_round = value_to_round
-		return self.settings.tile_size * round(self.value_to_round / self.settings.tile_size)
+	
+	def round(self, val):
+		if self.map_moving == True:
+			if self.direction == "right" or self.direction == "down":
+				return(math.floor(val))
+			else:
+				return(math.ceil(val))
+		else:
+			if self.direction == "right" or self.direction == "down":
+				return(math.ceil(val))
+			else:
+				return(math.floor(val))
 
 
 class NPC(Character):
@@ -398,7 +423,7 @@ class NPC_Still(NPC):
 		self.image = pygame.image.load('.\\Images\\Player\\player_test.png')
 		self.rect = self.image.get_rect()
 
-		self.response_messages =["Wow, you know so much about your colleagues! ; Let's be friends on BitLinked.", "Wow, you are so out of touch with your coworkers. ; Come back and talk to me later when you start caring."]
+		self.response_messages =["A", "Wow, you know so much about your colleagues! ; Let's be friends on BitLinked.", "Wow, you are so out of touch with your coworkers. ; Come back and talk to me later when you start caring."]
 
 
 	def movement(self):
