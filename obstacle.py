@@ -1,6 +1,7 @@
 import random
 import pygame
 import math
+import math_functions
 from pygame.sprite import Sprite
 from map_entity import MapEntity
 from collision_sprite import CollisionSprite
@@ -98,7 +99,7 @@ class CoffeeMachine(StaticObstacle):
 
 	def modify_player(self, player):
 		self.player = player
-		self.player.speed = 5
+		self.player.speed = 4
 
 	def revert_player(self, player):
 		self.player = player
@@ -107,7 +108,8 @@ class CoffeeMachine(StaticObstacle):
 class Wall(StaticObstacle):
 	def __init__(self, x, y, settings, screen, level_map):
 		super().__init__(x, y, settings, screen, level_map)
-		self.image = pygame.image.load('.\\Images\\Maps\\cubicle1.png')
+		self.image = pygame.image.load('.\\Images\\Maps\\golden_tile.png')
+
 		self.rect = self.image.get_rect()
 
 '''
@@ -279,8 +281,8 @@ class Character(DynamicObstacle):
 
 	def finish_animation(self):
 		#Finish the animation for all movements. Only run after a keyup ends the player movement. Also handles finishing animation after a collision.
-		self.x_round = self.settings.tile_size * self.round(self.x / self.settings.tile_size)
-		self.y_round = self.settings.tile_size * self.round(self.y / self.settings.tile_size)
+		self.x_round = self.settings.tile_size * round(self.x / self.settings.tile_size)
+		self.y_round = self.settings.tile_size * round(self.y / self.settings.tile_size)
 		if self.direction == "right" or self.direction == "left":
 			if abs(self.x - self.x_round) <= self.speed:
 				self.x = self.x_round
@@ -302,19 +304,6 @@ class Character(DynamicObstacle):
 					self.move_up()
 				elif self.direction == "down":
 					self.move_down()
-	
-	def round(self, val):
-		if self.map_moving == True:
-			if self.direction == "right" or self.direction == "down":
-				return(math.floor(val))
-			else:
-				return(math.ceil(val))
-		else:
-			if self.direction == "right" or self.direction == "down":
-				return(math.ceil(val))
-			else:
-				return(math.floor(val))
-
 
 class NPC(Character):
 	def __init__(self, x, y, settings, screen, level_map, collisions, move_width, move_height):
@@ -386,8 +375,8 @@ class NPC(Character):
 		self.check_collisions()
 		
 		if self.colliding:
-			self.x = self.round_to_tileset(self.x)
-			self.y = self.round_to_tileset(self.y)
+			self.x = math_functions.round_to_tileset(self.x, self.settings)
+			self.y = math_functions.round_to_tileset(self.y, self.settings)
 			self.change_direction()
 
 		elif self.finishing_animation and not self.staying_still:
@@ -423,7 +412,7 @@ class NPC_Still(NPC):
 		self.image = pygame.image.load('.\\Images\\Player\\player_test.png')
 		self.rect = self.image.get_rect()
 
-		self.response_messages =["A", "Wow, you know so much about your colleagues! ; Let's be friends on BitLinked.", "Wow, you are so out of touch with your coworkers. ; Come back and talk to me later when you start caring."]
+		self.response_messages =["I can't believe you picked the third option!", "Wow, you know so much about your colleagues! ; Let's be friends on BitLinked.", "Wow, you are so out of touch with your coworkers. ; Come back and talk to me later when you start caring."]
 
 
 	def movement(self):

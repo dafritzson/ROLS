@@ -1,13 +1,13 @@
 import pygame
+import math_functions
 from pygame.sprite import Sprite
 from obstacle import Character
 
 
 class Player(Character):
-	def __init__(self, x, y, settings, screen, level_map, collisions, map_entities, overlay_map_entities, golden_map_tile):
+	def __init__(self, x, y, settings, screen, level_map, collisions, map_entities, golden_map_tile):
 		super(Player, self).__init__(x, y, settings, screen, level_map, collisions)
 		self.map_entities = map_entities
-		self.overlay_map_entities = overlay_map_entities
 		self.golden_map_tile = golden_map_tile
 
 		#Default Image
@@ -27,7 +27,6 @@ class Player(Character):
 		self.report_count = 0
 
 		#Load player images
-		
 		self.image_left = [pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),
 		pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left2.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left2.png'),
 		pygame.image.load('.\\Images\\Player\\Walk_Left\\left2.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left3.png'),pygame.image.load('.\\Images\\Player\\Walk_Left\\left3.png'),
@@ -112,10 +111,10 @@ class Player(Character):
 	def finish_animation(self):
 		#Finish the animation for all movements. Only run after a keyup ends the player movement. Also handles finishing animation after a collision.
 		if self.finishing_animation:
-			self.player_x_round = self.settings.tile_size * self.round(self.x / self.settings.tile_size)
-			self.player_y_round = self.settings.tile_size * self.round(self.y / self.settings.tile_size)
-			self.golden_x_round = self.settings.tile_size * self.round(self.golden_map_tile.x / self.settings.tile_size)
-			self.golden_y_round = self.settings.tile_size * self.round(self.golden_map_tile.y / self.settings.tile_size)
+			self.player_x_round = math_functions.round_to_tileset(self.x, self.settings)
+			self.player_y_round = math_functions.round_to_tileset(self.y, self.settings)
+			self.golden_x_round = math_functions.round_to_tileset(self.golden_map_tile.x, self.settings)
+			self.golden_y_round = math_functions.round_to_tileset(self.golden_map_tile.y, self.settings)
 
 			if self.map_moving == False:
 				if self.direction == "right" or self.direction == "left":
@@ -145,8 +144,8 @@ class Player(Character):
 				if self.direction == "right" or self.direction == "left":
 					if abs(self.golden_map_tile.x - self.golden_x_round) <= self.speed:
 						for ent in self.map_entities:
-							ent.x = self.round_to_tileset(ent.x)
-						self.level_map.rect_overlay.x = self.round_to_tileset(self.level_map.rect_overlay.x)
+							ent.x = math_functions.round_to_tileset(ent.x, self.settings)
+						self.level_map.rect_overlay.x = math_functions.round_to_tileset(self.level_map.rect_overlay.x, self.settings)
 						self.finishing_animation = False
 						self.animation_count = 0
 					else:
@@ -161,8 +160,9 @@ class Player(Character):
 				elif self.direction == "up" or self.direction == "down":
 					if abs(self.golden_map_tile.y - self.golden_y_round) <= self.speed:
 						for ent in self.map_entities:
-							ent.y = self.round_to_tileset(ent.y)
-						self.level_map.rect_overlay.y = self.round_to_tileset(self.level_map.rect_overlay.y)
+							ent.y = math_functions.round_to_tileset(ent.y, self.settings)
+						self.level_map.rect_overlay.y = math_functions.round_to_tileset(self.level_map.rect_overlay.y, self.settings)
+						#self.y = self.player_y_round
 						self.finishing_animation = False
 						self.animation_count = 0
 					else:

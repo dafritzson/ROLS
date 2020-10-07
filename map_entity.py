@@ -16,9 +16,6 @@ class MapEntity(Sprite):
 		self.rect.y = self.y
 		self.screen.display.blit(self.image, self.rect)
 
-	def round_to_tileset(self, value_to_round):
-		self.value_to_round = value_to_round
-		return self.settings.tile_size * round(self.value_to_round / self.settings.tile_size)
 
 class Carpet(MapEntity):
 	def __init__(self, x, y, settings, screen):

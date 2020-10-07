@@ -1,11 +1,13 @@
 import pygame
 import time
+import audio_mixer as am
 
 class DisplayBox():
 	'''class to define the display box at the bottom of the screen'''
-	def __init__(self, settings, screen):
+	def __init__(self, settings, screen, audio_mixer):
 		self.settings = settings
 		self.screen = screen
+		self.audio_mixer = audio_mixer
 		
 		#font_main settings
 		self.text_color = (4,65,33)
@@ -44,6 +46,7 @@ class DisplayBox():
 		self.message_to_write = "Hello the_Guy"
 
 		#Dynamic Attributes
+		self.active_box = True
 		self.visible = False
 		self.noise_on = False
 		self.character_line_limit = 42
@@ -51,6 +54,7 @@ class DisplayBox():
 		self.message_type = "default"
 		self.response_options = ["Yes", "No"]
 		self.response_messages = ["A", "B"]
+		self.response_lines_to_show = 2
 
 	def prep_message(self):
 		#Reset display box, and counters and prep it for displaying the message
@@ -61,7 +65,6 @@ class DisplayBox():
 		self.reset_display_box_variables()
 		
 	def reset_display_box_variables(self):
-		self.noise_on = False
 		self.clear_lines()
 		self.word_count = 0
 		self.char_count = 0
@@ -93,6 +96,7 @@ class DisplayBox():
 		pygame.draw.rect(self.screen.display, self.color, self.rect)
 		self.noise_on = False
 
+		#Blitting through the main message
 		if not self.main_message_done:
 			if self.switching_lines:
 				self.switching_lines_count +=1
@@ -123,14 +127,17 @@ class DisplayBox():
 					else:
 						self.current_active_line = 2
 						self.fill_line2()
+		#Main message is done
 		else:
 			self.typing = False
 			#Trigger a response if it is a reponsive type message
 			if not self.message_sequence_done:
 				if self.message_type == "responsive":
 					self.blit_response()
-					self.blit_response_arrow()
+					self.blit_select_arrow()
 					self.noise_on = True
+					self.audio_mixer.audio_key = ('sound_display_box')
+					self.audio_mixer.load_sound()
 					if self.up_press:
 						if self.response_line == 1:
 							pass
@@ -227,6 +234,8 @@ class DisplayBox():
 		if not self.typing and self.main_message_done == False:
 			self.blit_next_arrow()	
 			self.noise_on = True
+			self.audio_mixer.audio_key = 'sound_display_box'
+			self.audio_mixer.load_sound()
 
 	def blit_next_arrow(self):
 		self.arrow_images = [pygame.image.load('.\\Images\\Misc\\down_arrow.png'), pygame.image.load('.\\Images\\Misc\\down_arrow.png'), pygame.image.load('.\\Images\\Misc\\down_arrow2.png')]
@@ -245,19 +254,20 @@ class DisplayBox():
 		pygame.draw.rect(self.screen.display, self.color, self.rect_response)
 
 		self.blit_response_scrollbar()
-		self.option_count = 0
-		for opt in self.response_options:
-			self.option_count += 1
-			self.line_image = self.font_sub.render(opt, True, self.text_color, self.color)
-			self.line_image_size = self.font_sub.size(opt)
-			self.line_rect = self.line_image.get_rect()
-			self.line_rect.left = self.rect_response.left + 20
-			#self.line_rect.centery = self.rect_response.top + self.rect_response.height/3 * self.option_count - self.response_line*10
-			self.line_rect.centery = self.rect_response.top + self.line_image_size[1] * self.option_count - self.response_line*10
+		self.option_count = 1
+		for option in self.response_options:
+			if self.option_count >= self.response_line and self.option_count<= self.response_lines_to_show:
+				self.option_count += 1
+				self.line_image = self.font_sub.render(option, True, self.text_color, self.color)
+				self.line_image_size = self.font_sub.size(option)
+				self.line_rect = self.line_image.get_rect()
+				self.line_rect.left = self.rect_response.left + 20
+				self.line_rect.centery = self.rect_response.top + self.line_image_size[1] * self.option_count - self.response_line*10
+			'''
 			if self.rect_response.contains(self.line_rect):
 				self.screen.display.blit(self.line_image, self.line_rect)
-
-	def blit_response_arrow(self):
+			'''
+	def blit_select_arrow(self):
 		self.arrow_image = pygame.image.load('.\\Images\\Misc\\right_arrow.png')
 		self.arrow_rect = self.arrow_image.get_rect()
 		self.arrow_rect.left = self.rect_response.left + 5
@@ -277,4 +287,9 @@ class DisplayBox():
 		self.message_to_write = self.response_messages[self.response_line - 1]
 		self.word_list = self.message_to_write.split()
 
+
+class Scrollbox(DisplayBox):
+	'''class to define the display box at the bottom of the screen'''
+	def __init__(self, settings, screen, audio_mixer):
+		super().__init__(settings, screen, audio_mixer)
 
