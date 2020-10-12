@@ -62,7 +62,6 @@ def keydown(event, settings, screen, player, menu, display_box, map_entities, co
 		if settings.game_paused == True and settings.game_state == "run":
 			if display_box.noise_on:
 				audio_mixer.play_sound()
-				print("hi")
 			if display_box.main_message_done == False:
 				if display_box.typing == True:
 					#don't switch or clear lines while typing

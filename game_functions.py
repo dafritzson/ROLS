@@ -164,11 +164,11 @@ def build_map(settings, screen, level_map, collisions, map_entities):
 
 def set_map_position(settings, screen, level_map, map_entities):
 	level_map.rect_overlay.x = level_map.rect_overlay.x + settings.tile_size*-12
-	level_map.rect_overlay.y =  level_map.rect_overlay.y + settings.tile_size*-32
+	level_map.rect_overlay.y =  level_map.rect_overlay.y + settings.tile_size*-33
 
 	for ent in map_entities:
 		ent.x = ent.x + settings.tile_size*-12
-		ent.y = ent.y + settings.tile_size*-32
+		ent.y = ent.y + settings.tile_size*-33
 
 
 

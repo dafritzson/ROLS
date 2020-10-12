@@ -27,6 +27,7 @@ from map_entity import Carpet, GoldenMapTile
 from timer import Timer
 
 def run_game():
+	pygame.mixer.pre_init(44100, -16, 1, 512)
 	pygame.mixer.init()
 	pygame.init()
 	clock = pygame.time.Clock()

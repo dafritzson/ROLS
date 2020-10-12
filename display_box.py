@@ -133,7 +133,7 @@ class DisplayBox():
 			#Trigger a response if it is a reponsive type message
 			if not self.message_sequence_done:
 				if self.message_type == "responsive":
-					self.blit_response()
+					self.blit_response_options()
 					self.blit_select_arrow()
 					self.noise_on = True
 					self.audio_mixer.audio_key = ('sound_display_box')
@@ -250,23 +250,21 @@ class DisplayBox():
 		self.arrow_rect.centery = self.rect.bottom - 15
 		self.screen.display.blit(self.arrow_image, self.arrow_rect)
 
-	def blit_response(self):
+	def blit_response_options(self):
 		pygame.draw.rect(self.screen.display, self.color, self.rect_response)
 
 		self.blit_response_scrollbar()
-		self.option_count = 1
+		self.option_count = 0
 		for option in self.response_options:
-			if self.option_count >= self.response_line and self.option_count<= self.response_lines_to_show:
-				self.option_count += 1
-				self.line_image = self.font_sub.render(option, True, self.text_color, self.color)
-				self.line_image_size = self.font_sub.size(option)
-				self.line_rect = self.line_image.get_rect()
-				self.line_rect.left = self.rect_response.left + 20
-				self.line_rect.centery = self.rect_response.top + self.line_image_size[1] * self.option_count - self.response_line*10
-			'''
+			self.option_count += 1
+			self.line_image = self.font_sub.render(option, True, self.text_color, self.color)
+			self.line_image_size = self.font_sub.size(option)
+			self.line_rect = self.line_image.get_rect()
+			self.line_rect.left = self.rect_response.left + 20
+			self.line_rect.centery = self.rect_response.top + self.line_image_size[1] * self.option_count - self.response_line*10
 			if self.rect_response.contains(self.line_rect):
 				self.screen.display.blit(self.line_image, self.line_rect)
-			'''
+
 	def blit_select_arrow(self):
 		self.arrow_image = pygame.image.load('.\\Images\\Misc\\right_arrow.png')
 		self.arrow_rect = self.arrow_image.get_rect()
@@ -286,6 +284,12 @@ class DisplayBox():
 		self.message_type = "default"
 		self.message_to_write = self.response_messages[self.response_line - 1]
 		self.word_list = self.message_to_write.split()
+
+	def deactivate(self):
+		self.active_box = False
+
+	def activate(self):
+		self.active_box = True
 
 
 class Scrollbox(DisplayBox):
