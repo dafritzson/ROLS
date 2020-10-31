@@ -66,7 +66,7 @@ def run_game():
 	report2 = Item(tile_unit*15, tile_unit*34, program_data, screen, level_map)
 
 	player = Player(tile_unit*6, tile_unit*10, program_data, screen, level_map, collisions, map_entities, golden_map_tile)
-	boy = NPC_Still(tile_unit*15, tile_unit*37, program_data, screen, level_map, collisions)
+	boy = NPC_Still(tile_unit*18, tile_unit*41, program_data, screen, level_map, collisions)
 	battle_kid = NPC_Battler(tile_unit*17, tile_unit*38, program_data, screen, level_map, collisions)
 
 	battle_arena = BattleArena(program_data, screen, audio_mixer)

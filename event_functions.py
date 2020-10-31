@@ -48,16 +48,14 @@ def keydown(groups, event, program_data, screen, player, menu, interaction_obsta
 				player.moving_down = player.move_in_progress = True
 				player.direction = "down"
 	else:
-		if event.key == pygame.K_UP:
-			program_data.arrow_value -= 1
-			print(program_data.arrow_value)
-			#dialog_box.up_press = True
-			#dialog_box.down_press = False
-		elif event.key == pygame.K_DOWN:
-			program_data.arrow_value += 1
-			print(program_data.arrow_value)
-			#dialog_box.down_press = True
-			#dialog_box.up_press = False
+		for display_box in groups.get('display_boxes'):
+			if display_box.is_active:
+				if event.key == pygame.K_UP:
+					display_box.arrow_value_y -= 1
+					
+				elif event.key == pygame.K_DOWN:
+					display_box.arrow_value_y += 1
+	
 
 
 	#All other intraction key presses

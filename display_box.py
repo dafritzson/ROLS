@@ -8,6 +8,7 @@ class DummyBox(Sprite):
 	def __init__(self):
 		super(DummyBox, self).__init__()
 		self.visible = False
+		self.is_active = False
 
 	def update(self):
 		pass
@@ -44,6 +45,9 @@ class DisplayBox(Sprite):
 		self.rect_response = pygame.Rect(self.response_left , self.response_top, self.response_width, self.response_height)
 		self.rect_scrollbar = pygame.Rect(self.screen.rect.width - 14, self.response_top + 6, round(self.program_data.tile_size/3) + 4 , self.response_height - 12)
 		
+		self.arrow_value_x = 0
+		self.arrow_value_y = 0
+
 
 		#Use the ";" character to indicate a break in the sentence. 
 		#All breaks will clear the display box and start displaying after the break
@@ -58,7 +62,7 @@ class DisplayBox(Sprite):
 		self.message_to_write = "Hello the_Guy"
 
 		#Dynamic Attributes
-		self.active_box = True
+		self.is_active = True
 		self.visible = False
 		self.noise_on = False
 		self.character_line_limit = 42
@@ -90,9 +94,7 @@ class DisplayBox(Sprite):
 		self.switching_lines = False
 		self.switching_lines_count = 0
 
-		#States of key preses for the display box
-		self.down_press = False
-		self.up_press = False
+
 
 	def clear_lines(self):
 		self.line1 = ""
@@ -151,27 +153,14 @@ class DisplayBox(Sprite):
 					self.audio_mixer.audio_key = ('sound_display_box')
 					self.audio_mixer.load_sound()
 					
-					#if self.response_line == 1:
-					#	self.program_data.arrow_value = 1
-					#elif self.response_line == self.responses_number:
-					#	self.program_data.arrow_value = self.responses_number
-					#else:
-					#	self.response_line = program_data.arrow_value
+					if self.arrow_value_y <= 1:
+						self.response_line = self.arrow_value_y = 1
+					elif self.arrow_value_y >= self.responses_number:
+						self.response_line = self.arrow_value_y = self.responses_number
+					else:
+						self.response_line = self.arrow_value_y
+					print(self.response_line)
 
-
-					#if self.up_press:
-					#	if self.response_line == 1:
-					#		pass
-					#	else:
-					#		self.response_line -=1
-					#		self.up_press = False
-
-					#if self.down_press:
-					#	if self.response_line == self.responses_number:
-					#		pass
-					#	else:
-					#		self.response_line +=1
-					#		self.down_press = False
 				else:
 					self.message_sequence_done = True
 
@@ -310,10 +299,10 @@ class DisplayBox(Sprite):
 		self.word_list = self.message_to_write.split()
 
 	def deactivate(self):
-		self.active_box = False
+		self.is_active = False
 
 	def activate(self):
-		self.active_box = True
+		self.is_active = True
 
 
 class Scrollbox(DisplayBox):
