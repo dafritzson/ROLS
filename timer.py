@@ -5,9 +5,9 @@ from pygame.sprite import Sprite
 
 class Timer(Sprite):
 	'''class to define the display box at the bottom of the screen'''
-	def __init__(self, settings, requester, target_time):
+	def __init__(self, program_data, requester, target_time):
 		super(Timer, self).__init__()
-		self.settings = settings
+		self.program_data = program_data
 		self.requester = requester
 		self.target_time = target_time
 		self.last_time = pygame.time.get_ticks()

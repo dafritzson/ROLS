@@ -1,8 +1,8 @@
 import pygame
 
 class AudioMixer():
-	def __init__(self, settings):
-		self.settings = settings
+	def __init__(self, program_data):
+		self.program_data = program_data
 		pygame.mixer.init()
 
 
@@ -10,6 +10,7 @@ class AudioMixer():
 		'main_theme' : ".\\Audio\\Elevator Music.mp3",
 		'sound_report' : ".\\Audio\\Item.wav",
 		'sound_display_box' : ".\\Audio\\Display Box.wav"
+
 		}
 		self.audio_key = 'sound_report'
 		self.sound_to_play = pygame.mixer.Sound(self.sound_library.get(self.audio_key))

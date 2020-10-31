@@ -1,9 +1,9 @@
 import pygame
 
 class LevelMap():
-	def __init__(self, settings, screen):
+	def __init__(self, program_data, screen):
 		self.screen = screen
-		self.settings = settings
+		self.program_data = program_data
 
 		self.image = pygame.image.load('.\\Images\\Maps\\Lobby\\Lobby_Test_Wall.png')
 		#self.image = pygame.image.load('.\\Images\\Maps\\map_background_test.png')

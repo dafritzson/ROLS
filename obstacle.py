@@ -9,9 +9,9 @@ from collision_sprite import CollisionSprite
 random.seed()
 
 class Obstacle(MapEntity):
-	def __init__(self, x, y, settings, screen, level_map):
-		super().__init__(x, y, settings, screen)
-		self.settings = settings
+	def __init__(self, x, y, program_data, screen, level_map):
+		super().__init__(x, y, program_data, screen)
+		self.program_data = program_data
 		self.screen = screen
 		self.level_map = level_map
 
@@ -48,17 +48,16 @@ class Obstacle(MapEntity):
 '''
 # This class may not be a necessary abstaction since it may not be different than the parent Obstacle class
 class StaticObstacle(Obstacle):
-	def __init__(self, x, y, settings, screen, level_map):
-		super().__init__(x, y, settings, screen, level_map)
+	def __init__(self, x, y, program_data, screen, level_map):
+		super().__init__(x, y, program_data, screen, level_map)
 
 class Item(StaticObstacle):		
-	def __init__(self, x, y, settings, screen, level_map):
-		super().__init__(x, y, settings, screen, level_map)
+	def __init__(self, x, y, program_data, screen, level_map):
+		super().__init__(x, y, program_data, screen, level_map)
 		#Load image
 		self.image = pygame.image.load('.\\Images\\Objects\\item.png')
 		#self.image = pygame.transform.scale(self.image, (20, 18))
 		self.rect = self.image.get_rect()
-		#self.rect_interaction = self.rect.inflate(0, 0)
 
 		#Logic Attributes
 		self.interactable = True
@@ -67,8 +66,8 @@ class Item(StaticObstacle):
 
 
 class Desk(StaticObstacle):
-	def __init__(self, x, y, settings, screen, level_map):
-		super().__init__(x, y, settings, screen, level_map)
+	def __init__(self, x, y, program_data, screen, level_map):
+		super().__init__(x, y, program_data, screen, level_map)
 
 		#Load image
 		self.image = pygame.image.load('.\\Images\\Objects\\desk_test.png')
@@ -82,8 +81,8 @@ class Desk(StaticObstacle):
 
 
 class CoffeeMachine(StaticObstacle):
-	def __init__(self, x, y, settings, screen, level_map):
-		super().__init__(x, y, settings, screen, level_map)
+	def __init__(self, x, y, program_data, screen, level_map):
+		super().__init__(x, y, program_data, screen, level_map)
 
 		#Load image
 		self.image = pygame.image.load('.\\Images\\Objects\\coffee_machine.png')
@@ -106,8 +105,8 @@ class CoffeeMachine(StaticObstacle):
 		self.player.speed = self.player.default_speed
 
 class Wall(StaticObstacle):
-	def __init__(self, x, y, settings, screen, level_map):
-		super().__init__(x, y, settings, screen, level_map)
+	def __init__(self, x, y, program_data, screen, level_map):
+		super().__init__(x, y, program_data, screen, level_map)
 		self.image = pygame.image.load('.\\Images\\Maps\\golden_tile.png')
 
 		self.rect = self.image.get_rect()
@@ -119,8 +118,8 @@ class Wall(StaticObstacle):
 **************************************************************************************************************************************************************************
 '''
 class DynamicObstacle(Obstacle):
-	def __init__(self, x, y, settings, screen, level_map, collisions):
-		super().__init__(x, y, settings, screen, level_map)
+	def __init__(self, x, y, program_data, screen, level_map, collisions):
+		super().__init__(x, y, program_data, screen, level_map)
 		self.collisions = collisions
 		
 		#Movement Attributes
@@ -177,7 +176,7 @@ class DynamicObstacle(Obstacle):
 		'''
 		
 	def update(self):
-		if not self.settings.game_paused:
+		if not self.program_data.game_paused:
 			self.movement()
 
 	def movement(self):
@@ -256,8 +255,6 @@ class DynamicObstacle(Obstacle):
 			self.collision_sprite = CollisionSprite(self.x, self.y + self.speed)
 		return self.collision_sprite
 	
-
-
 '''
 **************************************************************************************************************************************************************************
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -265,8 +262,8 @@ class DynamicObstacle(Obstacle):
 **************************************************************************************************************************************************************************
 '''
 class Character(DynamicObstacle):
-	def __init__(self, x, y, settings, screen, level_map, collisions):
-		super().__init__(x, y, settings, screen, level_map, collisions)
+	def __init__(self, x, y, program_data, screen, level_map, collisions):
+		super().__init__(x, y, program_data, screen, level_map, collisions)
 
 	def blitme(self):
 		self.rect.x = self.x
@@ -276,13 +273,13 @@ class Character(DynamicObstacle):
 
 		self.image_x = self.x 
 		#offset the y so the image of the player stands closer to the middle of the tile
-		self.image_y = self.y - self.settings.tile_size + 10
+		self.image_y = self.y - self.program_data.tile_size + 10
 		self.screen.display.blit(self.image, (self.image_x, self.image_y))
 
 	def finish_animation(self):
 		#Finish the animation for all movements. Only run after a keyup ends the player movement. Also handles finishing animation after a collision.
-		self.x_round = self.settings.tile_size * round(self.x / self.settings.tile_size)
-		self.y_round = self.settings.tile_size * round(self.y / self.settings.tile_size)
+		self.x_round = self.program_data.tile_size * round(self.x / self.program_data.tile_size)
+		self.y_round = self.program_data.tile_size * round(self.y / self.program_data.tile_size)
 		if self.direction == "right" or self.direction == "left":
 			if abs(self.x - self.x_round) <= self.speed:
 				self.x = self.x_round
@@ -304,140 +301,3 @@ class Character(DynamicObstacle):
 					self.move_up()
 				elif self.direction == "down":
 					self.move_down()
-
-class NPC(Character):
-	def __init__(self, x, y, settings, screen, level_map, collisions, move_width, move_height):
-		super().__init__(x, y, settings, screen, level_map, collisions)
-		self.move_width = move_width
-		self.move_height = move_height
-
-		#Load player image surface and define rectangle
-		self.image = pygame.image.load('.\\Images\\Player\\Walk_Left\\left1.png')
-		self.rect = self.image.get_rect()
-		self.rect_interaction = self.rect.inflate(20, 20)
-		#self.left_wall = self.x - (self.move_width / 2)
-		#self.right_wall = self.x + (self.move_width / 2)
-		#self.top_wall = self.y - (self.move_height / 2)
-		#self.bottom_wall = self.y + (self.move_height / 2)
-
-		#Movement Attributes
-		self.speed = 1
-		#attributes to help the NPC stay still for a certain count
-		self.still_count = 0
-		self.staying_still = False
-		#Default movement
-		self.moving_right = True
-
-
-		#Logic Attributes
-		self.interactable = True
-		self.interactable = True
-		self.is_NPC = True
-		self.needs_response = True
-		self.interaction_message = 'NPC_girl'
-		self.message_type = "responsive"
-
-	def face_player(self, player_direction):
-		self.player_direction = player_direction
-		x = {"right": 0 ,"up":1, "left":2, "down":3}
-		num = 2
-		num = (x.get(self.player_direction) + num) % 4
-		key_list = list(x.keys()) 
-		val_list = list(x.values()) 
-		self.direction = key_list[val_list.index(num)]
-
-		if self.direction == "right":
-			self.face_right()
-		elif self.direction == "left":
-			self.face_left()		
-		elif self.direction == "up":
-			self.face_up()		
-		elif self.direction == "down":
-			self.face_down()
-
-		self.still_count = 0
-
-	def change_direction(self):
-		x = {"right": 0 ,"up":1, "left":2, "down":3}
-		num = random.choice([1,3])
-		num = (x.get(self.direction) + num) % 4
-		key_list = list(x.keys()) 
-		val_list = list(x.values()) 
-		self.direction = key_list[val_list.index(num)]
-
-	def movement(self):
-		rand_num = random.randint(1,100)
-		
-		#Keep NPC withing given movement rectangle
-		#if self.x <= self.left_wall or self.x >= self.right_wall or self.y <= self.top_wall or self.y >= self.bottom_wall:
-			#self.change_direction()
-
-		self.check_collisions()
-		
-		if self.colliding:
-			self.x = math_functions.round_to_tileset(self.x, self.settings)
-			self.y = math_functions.round_to_tileset(self.y, self.settings)
-			self.change_direction()
-
-		elif self.finishing_animation and not self.staying_still:
-			self.finish_animation()
-		
-		elif rand_num <3 and not self.staying_still:
-			self.finishing_animation = True
-
-		elif self.staying_still and self.still_count <15:
-			self.still_count +=1
-
-		elif self.staying_still and self.still_count >=15:
-			self.staying_still = False
-			self.still_count = 0
-			self.change_direction()
-
-		else:
-			#standard player movement to respond to player movement flags set in the event loop
-			if self.direction == "right":
-				self.move_right()
-			elif self.direction == "left":
-				self.move_left()		
-			elif self.direction == "up":
-				self.move_up()		
-			elif self.direction == "down":
-				self.move_down()
-
-
-class NPC_Still(NPC):
-	def __init__(self,  x, y, settings, screen, level_map, collisions, move_width, move_height):
-		super().__init__(x, y, settings, screen, level_map, collisions, move_width, move_height)
-
-		self.image = pygame.image.load('.\\Images\\Player\\player_test.png')
-		self.rect = self.image.get_rect()
-
-		self.response_messages =["I can't believe you picked the third option!", "Wow, you know so much about your colleagues! ; Let's be friends on BitLinked.", "Wow, you are so out of touch with your coworkers. ; Come back and talk to me later when you start caring."]
-
-
-	def movement(self):
-		rand_num = random.randint(1,100)
-		self.still_count += 1
-
-		if not self.staying_still or self.still_count >30:
-
-			# % chance to stay still
-			if rand_num < 2:
-				self.staying_still = True
-				self.change_direction()
-				self.still_count = 0
-
-			else:
-				self.staying_still = False
-				if self.direction == "right":
-					self.face_right()
-				elif self.direction == "left":
-					self.face_left()		
-				elif self.direction == "up":
-					self.face_up()		
-				elif self.direction == "down":
-					self.face_down()
-
-
-
-

@@ -1,15 +1,26 @@
 import pygame
 import time
+from pygame.sprite import Sprite
 import audio_mixer as am
 
-class DisplayBox():
+class DummyBox(Sprite):
+	'''class to always populate the display_box group, to allow it to update properly'''
+	def __init__(self):
+		super(DummyBox, self).__init__()
+		self.visible = False
+
+	def update(self):
+		pass
+
+class DisplayBox(Sprite):
 	'''class to define the display box at the bottom of the screen'''
-	def __init__(self, settings, screen, audio_mixer):
-		self.settings = settings
+	def __init__(self, program_data, screen, audio_mixer):
+		super(DisplayBox, self).__init__()
+		self.program_data = program_data
 		self.screen = screen
 		self.audio_mixer = audio_mixer
 		
-		#font_main settings
+		#font_main program_data
 		self.text_color = (4,65,33)
 		self.font_main = pygame.font.SysFont('Calibri', 20)
 		self.font_sub = pygame.font.SysFont('Calibri', 18)
@@ -20,18 +31,18 @@ class DisplayBox():
 
 		#Default display box locations
 		self.width = self.screen.rect.width
-		self.height = self.settings.tile_size*3
+		self.height = self.program_data.tile_size*3
 		self.left = self.screen.rect.left
 		self.top = self.screen.rect.bottom - self.height
 		self.rect = pygame.Rect(self.left, self.top, self.width, self.height)
 
 		self.response_width = self.screen.rect.width/2
-		self.response_height = self.settings.tile_size*2
+		self.response_height = self.program_data.tile_size*2
 		self.response_left = self.screen.rect.right - self.response_width
-		self.response_top = self.screen.rect.bottom - self.settings.tile_size*5
+		self.response_top = self.screen.rect.bottom - self.program_data.tile_size*5
 
 		self.rect_response = pygame.Rect(self.response_left , self.response_top, self.response_width, self.response_height)
-		self.rect_scrollbar = pygame.Rect(self.screen.rect.width - 14, self.response_top + 6, round(self.settings.tile_size/3) + 4 , self.response_height - 12)
+		self.rect_scrollbar = pygame.Rect(self.screen.rect.width - 14, self.response_top + 6, round(self.program_data.tile_size/3) + 4 , self.response_height - 12)
 		
 
 		#Use the ";" character to indicate a break in the sentence. 
@@ -41,7 +52,8 @@ class DisplayBox():
 		'NPC_girl' : "Did you hear Bob and Karren went fishing last weekend?",
 		'desk' : "This is my desk",
 		'item_report_1' : "You found a level 1 BitCorp Report!",
-		'coffee_machine' : "Enjoy your brew! ; The Guy drank his coffee and is feeling ready to work."
+		'coffee_machine' : "Enjoy your brew! ; The Guy drank his coffee and is feeling ready to work.",
+		'battle_kid' : "Hey you! ; There is no way you are a more effective employee than me! ; Let's battle and find out"
 		}
 		self.message_to_write = "Hello the_Guy"
 
@@ -92,11 +104,11 @@ class DisplayBox():
 		self.current_active_line = 1
 		self.clear_on_click = False
 
-	def blitme(self):
+	def update(self):
 		pygame.draw.rect(self.screen.display, self.color, self.rect)
 		self.noise_on = False
 
-		#Blitting through the main message
+		#Updating through the main message
 		if not self.main_message_done:
 			if self.switching_lines:
 				self.switching_lines_count +=1
@@ -138,22 +150,34 @@ class DisplayBox():
 					self.noise_on = True
 					self.audio_mixer.audio_key = ('sound_display_box')
 					self.audio_mixer.load_sound()
-					if self.up_press:
-						if self.response_line == 1:
-							pass
-						else:
-							self.response_line -=1
-							self.up_press = False
+					
+					#if self.response_line == 1:
+					#	self.program_data.arrow_value = 1
+					#elif self.response_line == self.responses_number:
+					#	self.program_data.arrow_value = self.responses_number
+					#else:
+					#	self.response_line = program_data.arrow_value
 
-					if self.down_press:
-						if self.response_line == self.responses_number:
-							pass
-						else:
-							self.response_line +=1
-							self.down_press = False
+
+					#if self.up_press:
+					#	if self.response_line == 1:
+					#		pass
+					#	else:
+					#		self.response_line -=1
+					#		self.up_press = False
+
+					#if self.down_press:
+					#	if self.response_line == self.responses_number:
+					#		pass
+					#	else:
+					#		self.response_line +=1
+					#		self.down_press = False
 				else:
 					self.message_sequence_done = True
 
+			#Trigger battle sequence for battlers
+			if self.message_type == "battle":
+				self.program_data.game_state = "battle"
 		self.blit_lines()
 
 	def fill_line1(self):
@@ -275,7 +299,7 @@ class DisplayBox():
 		pygame.draw.rect(self.screen.display, self.color, self.rect)
 
 	def blit_response_scrollbar(self):
-		self.rect_scrollbar_inside = pygame.Rect(self.screen.rect.width - 11, self.response_top + 10, self.settings.tile_size/4 + 1, self.response_height - 50)
+		self.rect_scrollbar_inside = pygame.Rect(self.screen.rect.width - 11, self.response_top + 10, self.program_data.tile_size/4 + 1, self.response_height - 50)
 		pygame.draw.rect(self.screen.display, self.color_scrollbar, self.rect_scrollbar)
 		pygame.draw.rect(self.screen.display, self.color_scrollbar_inside, self.rect_scrollbar_inside)
 
@@ -294,6 +318,6 @@ class DisplayBox():
 
 class Scrollbox(DisplayBox):
 	'''class to define the display box at the bottom of the screen'''
-	def __init__(self, settings, screen, audio_mixer):
-		super().__init__(settings, screen, audio_mixer)
+	def __init__(self, program_data, screen, audio_mixer):
+		super().__init__(program_data, screen, audio_mixer)
 

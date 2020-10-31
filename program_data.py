@@ -1,11 +1,10 @@
 import time
-class Settings():
-	'''Hold all settings and back-end variables of the game'''
+class ProgramData():
+	'''Hold all program_variables and back-end variables of the game'''
 
 	def __init__(self):
 		'''initialize all attributes'''
 
-		self.bg_color = (3,181,133)
 		self.tile_size = 32
 		self.framerate = 36
 
@@ -15,8 +14,11 @@ class Settings():
 
 		#Game State
 		self.game_state = "main menu"
-		self.game_states = ["main menu", "run", "game menu", "close"]
+		self.game_states = ["main menu", "run", "game menu", "battle" "close"]
 		self.game_paused = False
+
+		#General Counters
+		self.arrow_value = 1
 
 
 

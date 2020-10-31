@@ -5,8 +5,8 @@ from obstacle import Character
 
 
 class Player(Character):
-	def __init__(self, x, y, settings, screen, level_map, collisions, map_entities, golden_map_tile):
-		super(Player, self).__init__(x, y, settings, screen, level_map, collisions)
+	def __init__(self, x, y, program_data, screen, level_map, collisions, map_entities, golden_map_tile):
+		super(Player, self).__init__(x, y, program_data, screen, level_map, collisions)
 		self.map_entities = map_entities
 		self.golden_map_tile = golden_map_tile
 
@@ -111,10 +111,10 @@ class Player(Character):
 	def finish_animation(self):
 		#Finish the animation for all movements. Only run after a keyup ends the player movement. Also handles finishing animation after a collision.
 		if self.finishing_animation:
-			self.player_x_round = math_functions.round_to_tileset(self.x, self.settings)
-			self.player_y_round = math_functions.round_to_tileset(self.y, self.settings)
-			self.golden_x_round = math_functions.round_to_tileset(self.golden_map_tile.x, self.settings)
-			self.golden_y_round = math_functions.round_to_tileset(self.golden_map_tile.y, self.settings)
+			self.player_x_round = math_functions.round_to_tileset(self.x, self.program_data)
+			self.player_y_round = math_functions.round_to_tileset(self.y, self.program_data)
+			self.golden_x_round = math_functions.round_to_tileset(self.golden_map_tile.x, self.program_data)
+			self.golden_y_round = math_functions.round_to_tileset(self.golden_map_tile.y, self.program_data)
 
 			if self.map_moving == False:
 				if self.direction == "right" or self.direction == "left":
@@ -144,8 +144,8 @@ class Player(Character):
 				if self.direction == "right" or self.direction == "left":
 					if abs(self.golden_map_tile.x - self.golden_x_round) <= self.speed:
 						for ent in self.map_entities:
-							ent.x = math_functions.round_to_tileset(ent.x, self.settings)
-						self.level_map.rect_overlay.x = math_functions.round_to_tileset(self.level_map.rect_overlay.x, self.settings)
+							ent.x = math_functions.round_to_tileset(ent.x, self.program_data)
+						self.level_map.rect_overlay.x = math_functions.round_to_tileset(self.level_map.rect_overlay.x, self.program_data)
 						self.finishing_animation = False
 						self.animation_count = 0
 					else:
@@ -160,8 +160,8 @@ class Player(Character):
 				elif self.direction == "up" or self.direction == "down":
 					if abs(self.golden_map_tile.y - self.golden_y_round) <= self.speed:
 						for ent in self.map_entities:
-							ent.y = math_functions.round_to_tileset(ent.y, self.settings)
-						self.level_map.rect_overlay.y = math_functions.round_to_tileset(self.level_map.rect_overlay.y, self.settings)
+							ent.y = math_functions.round_to_tileset(ent.y, self.program_data)
+						self.level_map.rect_overlay.y = math_functions.round_to_tileset(self.level_map.rect_overlay.y, self.program_data)
 						#self.y = self.player_y_round
 						self.finishing_animation = False
 						self.animation_count = 0
