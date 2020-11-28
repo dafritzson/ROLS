@@ -7,19 +7,21 @@ class DummyBox(Sprite):
 	'''class to always populate the display_box group, to allow it to update properly'''
 	def __init__(self):
 		super(DummyBox, self).__init__()
-		self.visible = False
+		self.is_visible = False
 		self.is_active = False
+		self.noise_on = False
+
 
 	def update(self):
 		pass
 
 class DisplayBox(Sprite):
 	'''class to define the display box at the bottom of the screen'''
-	def __init__(self, program_data, screen, audio_mixer):
+	def __init__(self, program_data):
 		super(DisplayBox, self).__init__()
 		self.program_data = program_data
-		self.screen = screen
-		self.audio_mixer = audio_mixer
+		self.screen = self.program_data.screen
+		self.audio_mixer = self.program_data.audio_mixer
 		
 		#font_main program_data
 		self.text_color = (4,65,33)
@@ -63,7 +65,7 @@ class DisplayBox(Sprite):
 
 		#Dynamic Attributes
 		self.is_active = True
-		self.visible = False
+		self.is_visible = False
 		self.noise_on = False
 		self.character_line_limit = 42
 		self.message_key = 'intro'
@@ -90,7 +92,7 @@ class DisplayBox(Sprite):
 		#States of the message being written
 		self.main_message_done = False
 		self.message_sequence_done = False
-		self.typing = False
+		self.typing = True
 		self.switching_lines = False
 		self.switching_lines_count = 0
 
@@ -159,11 +161,11 @@ class DisplayBox(Sprite):
 						self.response_line = self.arrow_value_y = self.responses_number
 					else:
 						self.response_line = self.arrow_value_y
-					print(self.response_line)
 
 				else:
 					self.message_sequence_done = True
-
+			else:
+				self.is_active = False
 			#Trigger battle sequence for battlers
 			if self.message_type == "battle":
 				self.program_data.game_state = "battle"

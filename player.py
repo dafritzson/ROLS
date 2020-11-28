@@ -5,10 +5,9 @@ from obstacle import Character
 
 
 class Player(Character):
-	def __init__(self, x, y, program_data, screen, level_map, collisions, map_entities, golden_map_tile):
-		super(Player, self).__init__(x, y, program_data, screen, level_map, collisions)
-		self.map_entities = map_entities
-		self.golden_map_tile = golden_map_tile
+	def __init__(self, x, y, program_data):
+		super(Player, self).__init__(x, y, program_data)
+		self.golden_map_tile = program_data.golden_map_tile
 
 		#Default Image
 		self.image = pygame.image.load('.\\Images\\Player\\player_test.png')
@@ -81,31 +80,31 @@ class Player(Character):
 
 #Functions to move the level_map and obstacles as defined by the players position
 	def move_map_right(self):
-		for ent in self.map_entities:
+		for ent in self.program_data.map_entities:
 			ent.x -= self.speed
 		self.level_map.rect_overlay.x -= self.speed
 
 	def move_map_left(self):
-		for ent in self.map_entities:
+		for ent in self.program_data.map_entities:
 			ent.x += self.speed
 		self.level_map.rect_overlay.x += self.speed
 
 	def move_map_up(self):
-		for ent in self.map_entities:
+		for ent in self.program_data.map_entities:
 			ent.y += self.speed
 		self.level_map.rect_overlay.y += self.speed
 
 	def move_map_down(self):
-		for ent in self.map_entities:
+		for ent in self.program_data.map_entities:
 			ent.y -= self.speed
 		self.level_map.rect_overlay.y -= self.speed
 
 
 	def interaction(self):
-		self.collisions.remove(self)
-		if  pygame.sprite.spritecollide(self, self.collisions, False):
+		self.program_data.collisions.remove(self)
+		if  pygame.sprite.spritecollide(self, self.program_data.collisions, False):
 			pass
-		self.collisions.add(self)
+		self.program_data.collisions.add(self)
 
 	
 	def finish_animation(self):
@@ -143,7 +142,7 @@ class Player(Character):
 			else:
 				if self.direction == "right" or self.direction == "left":
 					if abs(self.golden_map_tile.x - self.golden_x_round) <= self.speed:
-						for ent in self.map_entities:
+						for ent in self.program_data.map_entities:
 							ent.x = math_functions.round_to_tileset(ent.x, self.program_data)
 						self.level_map.rect_overlay.x = math_functions.round_to_tileset(self.level_map.rect_overlay.x, self.program_data)
 						self.finishing_animation = False
@@ -159,7 +158,7 @@ class Player(Character):
 					
 				elif self.direction == "up" or self.direction == "down":
 					if abs(self.golden_map_tile.y - self.golden_y_round) <= self.speed:
-						for ent in self.map_entities:
+						for ent in self.program_data.map_entities:
 							ent.y = math_functions.round_to_tileset(ent.y, self.program_data)
 						self.level_map.rect_overlay.y = math_functions.round_to_tileset(self.level_map.rect_overlay.y, self.program_data)
 						#self.y = self.player_y_round

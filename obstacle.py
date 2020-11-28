@@ -3,18 +3,14 @@ import pygame
 import math
 import math_functions
 from pygame.sprite import Sprite
-from map_entity import MapEntity
+from map_entity import PhysicalMapEntity
 from collision_sprite import CollisionSprite
 
 random.seed()
 
-class Obstacle(MapEntity):
-	def __init__(self, x, y, program_data, screen, level_map):
-		super().__init__(x, y, program_data, screen)
-		self.program_data = program_data
-		self.screen = screen
-		self.level_map = level_map
-
+class Obstacle(PhysicalMapEntity):
+	def __init__(self, x, y, program_data):
+		super().__init__(x, y, program_data)
 		#Static Logic Attributes
 		#can the obstacle interact with the player
 		self.interactable = False
@@ -48,12 +44,12 @@ class Obstacle(MapEntity):
 '''
 # This class may not be a necessary abstaction since it may not be different than the parent Obstacle class
 class StaticObstacle(Obstacle):
-	def __init__(self, x, y, program_data, screen, level_map):
-		super().__init__(x, y, program_data, screen, level_map)
+	def __init__(self, x, y, program_data):
+		super().__init__(x, y, program_data)
 
 class Item(StaticObstacle):		
-	def __init__(self, x, y, program_data, screen, level_map):
-		super().__init__(x, y, program_data, screen, level_map)
+	def __init__(self, x, y, program_data):
+		super().__init__(x, y, program_data)
 		#Load image
 		self.image = pygame.image.load('.\\Images\\Objects\\item.png')
 		#self.image = pygame.transform.scale(self.image, (20, 18))
@@ -66,8 +62,8 @@ class Item(StaticObstacle):
 
 
 class Desk(StaticObstacle):
-	def __init__(self, x, y, program_data, screen, level_map):
-		super().__init__(x, y, program_data, screen, level_map)
+	def __init__(self, x, y, program_data):
+		super().__init__(x, y, program_data)
 
 		#Load image
 		self.image = pygame.image.load('.\\Images\\Objects\\desk_test.png')
@@ -81,8 +77,8 @@ class Desk(StaticObstacle):
 
 
 class CoffeeMachine(StaticObstacle):
-	def __init__(self, x, y, program_data, screen, level_map):
-		super().__init__(x, y, program_data, screen, level_map)
+	def __init__(self, x, y, program_data):
+		super().__init__(x, y, program_data)
 
 		#Load image
 		self.image = pygame.image.load('.\\Images\\Objects\\coffee_machine.png')
@@ -105,8 +101,8 @@ class CoffeeMachine(StaticObstacle):
 		self.player.speed = self.player.default_speed
 
 class Wall(StaticObstacle):
-	def __init__(self, x, y, program_data, screen, level_map):
-		super().__init__(x, y, program_data, screen, level_map)
+	def __init__(self, x, y, program_data):
+		super().__init__(x, y, program_data)
 		self.image = pygame.image.load('.\\Images\\Maps\\golden_tile.png')
 
 		self.rect = self.image.get_rect()
@@ -118,9 +114,8 @@ class Wall(StaticObstacle):
 **************************************************************************************************************************************************************************
 '''
 class DynamicObstacle(Obstacle):
-	def __init__(self, x, y, program_data, screen, level_map, collisions):
-		super().__init__(x, y, program_data, screen, level_map)
-		self.collisions = collisions
+	def __init__(self, x, y, program_data):
+		super().__init__(x, y, program_data)
 		
 		#Movement Attributes
 		#Flaf for when the player is moving with the downkeys
@@ -235,14 +230,14 @@ class DynamicObstacle(Obstacle):
 
 	def check_collisions(self):
 		#If player collides with an object rectangle, stop the player from moving in that direction
-		self.collisions.remove(self)
+		self.program_data.collisions.remove(self)
 		self.collision_sprite = self.get_collision_rect()
-		if  pygame.sprite.spritecollide(self.collision_sprite, self.collisions, False):
+		if  pygame.sprite.spritecollide(self.collision_sprite, self.program_data.collisions, False):
 			self.colliding = True
 			self.animation_count = 0
 		else:
 			self.colliding = False
-		self.collisions.add(self)
+		self.program_data.collisions.add(self)
 
 	def get_collision_rect(self):	
 		if self.direction == "right":
@@ -262,8 +257,8 @@ class DynamicObstacle(Obstacle):
 **************************************************************************************************************************************************************************
 '''
 class Character(DynamicObstacle):
-	def __init__(self, x, y, program_data, screen, level_map, collisions):
-		super().__init__(x, y, program_data, screen, level_map, collisions)
+	def __init__(self, x, y, program_data):
+		super().__init__(x, y, program_data)
 
 	def blitme(self):
 		self.rect.x = self.x

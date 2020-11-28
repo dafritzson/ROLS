@@ -3,31 +3,31 @@ from time import sleep
 import pygame
 import game_functions as gf
 from display_box import DummyBox, DisplayBox
-import audio_mixer as am
 from timer import Timer
 
 
-
-
 '''All Event functions will be handled in this file'''
-def event_loop(groups, program_data, screen, player, menu, interaction_obstacle, audio_mixer):
+def event_loop(program_data, player, menu):
 	'''check for all event types'''
 	event_list = pygame.event.get()
 	for event in event_list:
 		if event.type == pygame.QUIT:
 			sys.exit()
 		elif event.type == pygame.KEYDOWN:
-			keydown(groups, event, program_data, screen, player, menu, interaction_obstacle, audio_mixer)
+			keydown(event, program_data, player, menu)
 		elif event.type == pygame.KEYUP:
 			keyup(event, program_data, player)
 		elif event.type == pygame.MOUSEBUTTONDOWN:
 			mouse_x, mouse_y = pygame.mouse.get_pos()
-			mouse_click(program_data, screen, player, menu, mouse_x, mouse_y, audio_mixer)
+			mouse_click(program_data, player, menu, mouse_x, mouse_y)
 
 
-def keydown(groups, event, program_data, screen, player, menu, interaction_obstacle, audio_mixer):
+def keydown(event, program_data, player, menu):
 	'''check for all keydowns'''
 	#If the player is alrady moving, reject the new movement direction and add that event back to the queue to process later
+	interaction_obstacle = program_data.interaction_obstacle
+	audio_mixer = program_data.audio_mixer
+
 	if program_data.game_paused == False:
 		if player.move_in_progress == True or player.finishing_animation == True:
 			if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
@@ -48,7 +48,7 @@ def keydown(groups, event, program_data, screen, player, menu, interaction_obsta
 				player.moving_down = player.move_in_progress = True
 				player.direction = "down"
 	else:
-		for display_box in groups.get('display_boxes'):
+		for display_box in program_data.display_boxes:
 			if display_box.is_active:
 				if event.key == pygame.K_UP:
 					display_box.arrow_value_y -= 1
@@ -57,19 +57,19 @@ def keydown(groups, event, program_data, screen, player, menu, interaction_obsta
 					display_box.arrow_value_y += 1
 	
 
-
 	#All other intraction key presses
 	#Events with Action button
 	if event.key == pygame.K_a: 
+		#First 'a' press before game is paused
 		if program_data.game_state == "run" and player.ready_for_interaction and program_data.game_paused == False:
-			dialog_box = DisplayBox(program_data, screen, audio_mixer)
-			groups.get('display_boxes').add(dialog_box)
+			dialog_box = DisplayBox(program_data)
+			program_data.display_boxes.add(dialog_box)
 			#Transfer necessary program_data to build the display box based on the interaction obstacle.
 			dialog_box.message_key = interaction_obstacle.interaction_message
 			dialog_box.message_type = interaction_obstacle.message_type
 			dialog_box.response_options = interaction_obstacle.response_options
 			dialog_box.response_messages = interaction_obstacle.response_messages
-			dialog_box.visible = True
+			dialog_box.is_visible = True
 			program_data.game_paused = True
 			dialog_box.prep_message()
 
@@ -77,9 +77,9 @@ def keydown(groups, event, program_data, screen, player, menu, interaction_obsta
 				audio_mixer.audio_key = 'sound_report'
 				audio_mixer.load_sound()
 				audio_mixer.play_sound()
-				groups.get('map_entities').remove(interaction_obstacle)
-				groups.get('collisions').remove(interaction_obstacle)
-				groups.get('items').remove(interaction_obstacle)
+				program_data.map_entities.remove(interaction_obstacle)
+				program_data.collisions.remove(interaction_obstacle)
+				program_data.items.remove(interaction_obstacle)
 				player.report_count += 1
 
 			if interaction_obstacle.is_NPC:
@@ -89,33 +89,32 @@ def keydown(groups, event, program_data, screen, player, menu, interaction_obsta
 
 			if interaction_obstacle.player_modifier:
 				interaction_obstacle.modify_player(player)
-				groups.get('timers').empty()
+				program_data.timers.empty()
 				mod_timer = Timer(program_data, interaction_obstacle, interaction_obstacle.player_modifier_duration)
-				groups.get('timers').add(mod_timer)
+				program_data.timers.add(mod_timer)
 	
-		#Handle actions through a screen box (game is paused)
-		elif program_data.game_paused == True and program_data.game_state == "run":
-			if dialog_box.noise_on:
-				audio_mixer.play_sound()
-			if dialog_box.main_message_done == False:
-				if dialog_box.typing == True:
-					#don't switch or clear lines while typing
-					pass
-				else:
-					if dialog_box.clear_on_click == True:
-						dialog_box.clear_lines()
+		#Handle all 'a' presses when game is paused
+		if program_data.game_paused == True and program_data.game_state == "run":
+			for display_box in program_data.display_boxes:
+				if display_box.noise_on:
+					audio_mixer.play_sound()
+				if display_box.main_message_done == False:
+					if display_box.typing == True:
+						#don't switch or clear lines while typing
+						pass
 					else:
-						dialog_box.switch_lines()
-			elif dialog_box.main_message_done == True and dialog_box.message_sequence_done == False:
-				dialog_box.run_responsive_message()
-			#Close the displaybox
-			else:
-				dialog_box.clear_lines()
-				dialog_box.visible = False
-				groups.get('display_box').remove(dialog_box)
-				program_data.game_paused = False
-
-
+						if display_box.clear_on_click == True:
+							display_box.clear_lines()
+						else:
+							display_box.switch_lines()
+				elif display_box.main_message_done == True and display_box.message_sequence_done == False:
+					display_box.run_responsive_message()
+				#Close the displaybox
+				else:
+					display_box.clear_lines()
+					display_box.is_visible = False
+					program_data.display_boxes.remove(display_box)
+					program_data.game_paused = False
 
 
 	if event.key == pygame.K_SPACE and program_data.game_state == "run":
@@ -146,7 +145,9 @@ def keyup(event, program_data, player):
 		pygame.event.clear()
 
 
-def mouse_click(program_data, screen, player, menu, mouse_x, mouse_y, audio_mixer):
+def mouse_click(program_data, player, menu, mouse_x, mouse_y):
+	audio_mixer = program_data.audio_mixer
+
 	if program_data.game_state == "main menu":
 		button_clicked = menu.newgame_rect.collidepoint(mouse_x, mouse_y)
 		if button_clicked:

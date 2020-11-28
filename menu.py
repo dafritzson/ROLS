@@ -2,9 +2,9 @@ import pygame
 
 class Menu():
 	'''top level class of all menu types'''
-	def __init__(self, program_data, screen, player):
-		self.screen = screen
+	def __init__(self, program_data, player):
 		self.program_data = program_data
+		self.screen = self.program_data.screen
 		self.player = player
 
 
@@ -27,8 +27,8 @@ class Menu():
 
 class MainMenu(Menu):
 	'''Beginning Menu'''
-	def __init__(self, program_data, screen, player):
-		super().__init__(program_data, screen, player)
+	def __init__(self, program_data, player):
+		super().__init__(program_data, player)
 
 		#Define the main menu rectangles
 		self.newgame_image = pygame.image.load('.\\Images\\Menu\\New Game.png')
@@ -51,8 +51,8 @@ class MainMenu(Menu):
 
 class GameMenu(Menu):
 	'''In-game menu'''
-	def __init__(self, program_data, screen, player):
-		super().__init__(program_data, screen, player)
+	def __init__(self, program_data, player):
+		super().__init__(program_data, player)
 
 		self.left = self.screen.rect.centerx - self.width/2
 		self.top = self.screen.rect.centery - self.height/2

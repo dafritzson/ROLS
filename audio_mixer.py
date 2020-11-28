@@ -1,8 +1,7 @@
 import pygame
 
 class AudioMixer():
-	def __init__(self, program_data):
-		self.program_data = program_data
+	def __init__(self):
 		pygame.mixer.init()
 
 

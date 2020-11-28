@@ -5,8 +5,8 @@ from pygame.sprite import Sprite
 from obstacle import Character
 
 class NPC(Character):
-	def __init__(self, x, y, program_data, screen, level_map, collisions):
-		super().__init__(x, y, program_data, screen, level_map, collisions)
+	def __init__(self, x, y, program_data):
+		super().__init__(x, y, program_data)
 
 		#Load player image surface and define rectangle
 		self.image = pygame.image.load('.\\Images\\Player\\player_test.png')
@@ -95,8 +95,8 @@ class NPC(Character):
 
 
 class NPC_Still(NPC):
-	def __init__(self,  x, y, program_data, screen, level_map, collisions):
-		super().__init__(x, y, program_data, screen, level_map, collisions)
+	def __init__(self,  x, y, program_data):
+		super().__init__(x, y, program_data)
 
 		self.response_messages =["I can't believe you picked the third option!", "Wow, you know so much about your colleagues! ; Let's be friends on BitLinked.", "Wow, you are so out of touch with your coworkers. ; Come back and talk to me later when you start caring."]
 
@@ -125,8 +125,8 @@ class NPC_Still(NPC):
 					self.face_down()
 
 class NPC_Battler(NPC_Still):
-	def __init__(self,  x, y, program_data, screen, level_map, collisions):
-		super().__init__(x, y, program_data, screen, level_map, collisions)
+	def __init__(self,  x, y, program_data):
+		super().__init__(x, y, program_data)
 
 		self.is_battler = True
 		self.interaction_message = 'battle_kid'
