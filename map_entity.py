@@ -1,5 +1,8 @@
 import pygame
 from pygame.sprite import Sprite
+from program_variables import program_data as pd, settings
+
+
 
 class MapEntity(Sprite):
 	def __init__(self, x, y):
@@ -12,19 +15,16 @@ class MapEntity(Sprite):
 	def blitme(self):
 		pass
 
-class GoldenMapTile(MapEntity):
-	def __init__(self, x, y):
-		super().__init__(x, y)
-		self.image = pygame.image.load('.\\Images\\Maps\\golden_tile.png')
-		self.rect = self.image.get_rect()
+
 
 class PhysicalMapEntity(MapEntity):
-	def __init__(self, x, y, program_data):
+	def __init__(self, x, y):
 		super().__init__(x, y)
 
-		self.program_data = program_data
-		self.level_map = self.program_data.level_map
-		self.screen = self.program_data.screen
+		self.level_map = pd.level_map
+		self.screen = settings.screen
+		self.tile_size = settings.tile_size
+		self.collisions = pd.collisions
 
 	def blitme(self):
 		self.rect.x = self.x
@@ -32,8 +32,8 @@ class PhysicalMapEntity(MapEntity):
 		self.screen.display.blit(self.image, self.rect)
 
 class Carpet(PhysicalMapEntity):
-	def __init__(self, x, y, program_data):
-		super().__init__(x, y, program_data)
+	def __init__(self, x, y):
+		super().__init__(x, y)
 		self.image = pygame.image.load('.\\Images\\Maps\\carpet_test.png')
 		self.rect = self.image.get_rect()
 

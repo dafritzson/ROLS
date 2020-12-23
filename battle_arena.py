@@ -1,12 +1,11 @@
 import pygame
 import time
-import audio_mixer as am
+from program_variables import program_data as pd, settings
 
 class BattleArena():
 	'''class to define the battle arena'''
-	def __init__(self, program_data):
-		self.program_data = program_data
-		self.screen = self.program_data.screen
+	def __init__(self):
+		self.screen = settings.screen
 
 		self.backgorund_color = (240, 240, 240)
 

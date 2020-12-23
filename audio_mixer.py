@@ -4,7 +4,6 @@ class AudioMixer():
 	def __init__(self):
 		pygame.mixer.init()
 
-
 		self.sound_library = {
 		'main_theme' : ".\\Audio\\Elevator Music.mp3",
 		'sound_report' : ".\\Audio\\Item.wav",

@@ -2,12 +2,13 @@ import pygame
 import math_functions
 from pygame.sprite import Sprite
 from obstacle import Character
+from program_variables import program_data as pd, settings
 
 
 class Player(Character):
-	def __init__(self, x, y, program_data):
-		super(Player, self).__init__(x, y, program_data)
-		self.golden_map_tile = program_data.golden_map_tile
+	def __init__(self, x, y):
+		super(Player, self).__init__(x, y)
+		self.golden_map_tile = settings.golden_map_tile
 
 		#Default Image
 		self.image = pygame.image.load('.\\Images\\Player\\player_test.png')
@@ -80,40 +81,40 @@ class Player(Character):
 
 #Functions to move the level_map and obstacles as defined by the players position
 	def move_map_right(self):
-		for ent in self.program_data.map_entities:
+		for ent in pd.map_entities:
 			ent.x -= self.speed
 		self.level_map.rect_overlay.x -= self.speed
 
 	def move_map_left(self):
-		for ent in self.program_data.map_entities:
+		for ent in pd.map_entities:
 			ent.x += self.speed
 		self.level_map.rect_overlay.x += self.speed
 
 	def move_map_up(self):
-		for ent in self.program_data.map_entities:
+		for ent in pd.map_entities:
 			ent.y += self.speed
 		self.level_map.rect_overlay.y += self.speed
 
 	def move_map_down(self):
-		for ent in self.program_data.map_entities:
+		for ent in pd.map_entities:
 			ent.y -= self.speed
 		self.level_map.rect_overlay.y -= self.speed
 
 
 	def interaction(self):
-		self.program_data.collisions.remove(self)
-		if  pygame.sprite.spritecollide(self, self.program_data.collisions, False):
+		self.collisions.remove(self)
+		if  pygame.sprite.spritecollide(self, self.collisions, False):
 			pass
-		self.program_data.collisions.add(self)
+		self.collisions.add(self)
 
 	
 	def finish_animation(self):
 		#Finish the animation for all movements. Only run after a keyup ends the player movement. Also handles finishing animation after a collision.
 		if self.finishing_animation:
-			self.player_x_round = math_functions.round_to_tileset(self.x, self.program_data)
-			self.player_y_round = math_functions.round_to_tileset(self.y, self.program_data)
-			self.golden_x_round = math_functions.round_to_tileset(self.golden_map_tile.x, self.program_data)
-			self.golden_y_round = math_functions.round_to_tileset(self.golden_map_tile.y, self.program_data)
+			self.player_x_round = math_functions.round_to_tileset(self.x)
+			self.player_y_round = math_functions.round_to_tileset(self.y)
+			self.golden_x_round = math_functions.round_to_tileset(self.golden_map_tile.x)
+			self.golden_y_round = math_functions.round_to_tileset(self.golden_map_tile.y)
 
 			if self.map_moving == False:
 				if self.direction == "right" or self.direction == "left":
@@ -142,9 +143,9 @@ class Player(Character):
 			else:
 				if self.direction == "right" or self.direction == "left":
 					if abs(self.golden_map_tile.x - self.golden_x_round) <= self.speed:
-						for ent in self.program_data.map_entities:
-							ent.x = math_functions.round_to_tileset(ent.x, self.program_data)
-						self.level_map.rect_overlay.x = math_functions.round_to_tileset(self.level_map.rect_overlay.x, self.program_data)
+						for ent in pd.map_entities:
+							ent.x = math_functions.round_to_tileset(ent.x)
+						self.level_map.rect_overlay.x = math_functions.round_to_tileset(self.level_map.rect_overlay.x)
 						self.finishing_animation = False
 						self.animation_count = 0
 					else:
@@ -158,9 +159,9 @@ class Player(Character):
 					
 				elif self.direction == "up" or self.direction == "down":
 					if abs(self.golden_map_tile.y - self.golden_y_round) <= self.speed:
-						for ent in self.program_data.map_entities:
-							ent.y = math_functions.round_to_tileset(ent.y, self.program_data)
-						self.level_map.rect_overlay.y = math_functions.round_to_tileset(self.level_map.rect_overlay.y, self.program_data)
+						for ent in pd.map_entities:
+							ent.y = math_functions.round_to_tileset(ent.y)
+						self.level_map.rect_overlay.y = math_functions.round_to_tileset(self.level_map.rect_overlay.y)
 						#self.y = self.player_y_round
 						self.finishing_animation = False
 						self.animation_count = 0

@@ -4,9 +4,10 @@ import math_functions
 from pygame.sprite import Sprite
 from obstacle import Character
 
+
 class NPC(Character):
-	def __init__(self, x, y, program_data):
-		super().__init__(x, y, program_data)
+	def __init__(self, x, y):
+		super().__init__(x, y)
 
 		#Load player image surface and define rectangle
 		self.image = pygame.image.load('.\\Images\\Player\\player_test.png')
@@ -64,8 +65,8 @@ class NPC(Character):
 		self.check_collisions()
 		
 		if self.colliding:
-			self.x = math_functions.round_to_tileset(self.x, self.program_data)
-			self.y = math_functions.round_to_tileset(self.y, self.program_data)
+			self.x = math_functions.round_to_tileset(self.x)
+			self.y = math_functions.round_to_tileset(self.y)
 			self.change_direction()
 
 		elif self.finishing_animation and not self.staying_still:
@@ -95,8 +96,8 @@ class NPC(Character):
 
 
 class NPC_Still(NPC):
-	def __init__(self,  x, y, program_data):
-		super().__init__(x, y, program_data)
+	def __init__(self,  x, y):
+		super().__init__(x, y)
 
 		self.response_messages =["I can't believe you picked the third option!", "Wow, you know so much about your colleagues! ; Let's be friends on BitLinked.", "Wow, you are so out of touch with your coworkers. ; Come back and talk to me later when you start caring."]
 
@@ -125,8 +126,8 @@ class NPC_Still(NPC):
 					self.face_down()
 
 class NPC_Battler(NPC_Still):
-	def __init__(self,  x, y, program_data):
-		super().__init__(x, y, program_data)
+	def __init__(self,  x, y):
+		super().__init__(x, y)
 
 		self.is_battler = True
 		self.interaction_message = 'battle_kid'

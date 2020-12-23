@@ -5,12 +5,15 @@ import math_functions
 from pygame.sprite import Sprite
 from map_entity import PhysicalMapEntity
 from collision_sprite import CollisionSprite
+from program_variables import program_data as pd, settings
+
+
 
 random.seed()
 
 class Obstacle(PhysicalMapEntity):
-	def __init__(self, x, y, program_data):
-		super().__init__(x, y, program_data)
+	def __init__(self, x, y):
+		super().__init__(x, y)
 		#Static Logic Attributes
 		#can the obstacle interact with the player
 		self.interactable = False
@@ -44,12 +47,12 @@ class Obstacle(PhysicalMapEntity):
 '''
 # This class may not be a necessary abstaction since it may not be different than the parent Obstacle class
 class StaticObstacle(Obstacle):
-	def __init__(self, x, y, program_data):
-		super().__init__(x, y, program_data)
+	def __init__(self, x, y):
+		super().__init__(x, y)
 
 class Item(StaticObstacle):		
-	def __init__(self, x, y, program_data):
-		super().__init__(x, y, program_data)
+	def __init__(self, x, y):
+		super().__init__(x, y)
 		#Load image
 		self.image = pygame.image.load('.\\Images\\Objects\\item.png')
 		#self.image = pygame.transform.scale(self.image, (20, 18))
@@ -62,8 +65,8 @@ class Item(StaticObstacle):
 
 
 class Desk(StaticObstacle):
-	def __init__(self, x, y, program_data):
-		super().__init__(x, y, program_data)
+	def __init__(self, x, y):
+		super().__init__(x, y)
 
 		#Load image
 		self.image = pygame.image.load('.\\Images\\Objects\\desk_test.png')
@@ -77,8 +80,8 @@ class Desk(StaticObstacle):
 
 
 class CoffeeMachine(StaticObstacle):
-	def __init__(self, x, y, program_data):
-		super().__init__(x, y, program_data)
+	def __init__(self, x, y):
+		super().__init__(x, y)
 
 		#Load image
 		self.image = pygame.image.load('.\\Images\\Objects\\coffee_machine.png')
@@ -101,8 +104,8 @@ class CoffeeMachine(StaticObstacle):
 		self.player.speed = self.player.default_speed
 
 class Wall(StaticObstacle):
-	def __init__(self, x, y, program_data):
-		super().__init__(x, y, program_data)
+	def __init__(self, x, y):
+		super().__init__(x, y)
 		self.image = pygame.image.load('.\\Images\\Maps\\golden_tile.png')
 
 		self.rect = self.image.get_rect()
@@ -114,8 +117,8 @@ class Wall(StaticObstacle):
 **************************************************************************************************************************************************************************
 '''
 class DynamicObstacle(Obstacle):
-	def __init__(self, x, y, program_data):
-		super().__init__(x, y, program_data)
+	def __init__(self, x, y):
+		super().__init__(x, y)
 		
 		#Movement Attributes
 		#Flaf for when the player is moving with the downkeys
@@ -171,7 +174,7 @@ class DynamicObstacle(Obstacle):
 		'''
 		
 	def update(self):
-		if not self.program_data.game_paused:
+		if not pd.game_paused:
 			self.movement()
 
 	def movement(self):
@@ -230,14 +233,14 @@ class DynamicObstacle(Obstacle):
 
 	def check_collisions(self):
 		#If player collides with an object rectangle, stop the player from moving in that direction
-		self.program_data.collisions.remove(self)
+		self.collisions.remove(self)
 		self.collision_sprite = self.get_collision_rect()
-		if  pygame.sprite.spritecollide(self.collision_sprite, self.program_data.collisions, False):
+		if  pygame.sprite.spritecollide(self.collision_sprite, self.collisions, False):
 			self.colliding = True
 			self.animation_count = 0
 		else:
 			self.colliding = False
-		self.program_data.collisions.add(self)
+		self.collisions.add(self)
 
 	def get_collision_rect(self):	
 		if self.direction == "right":
@@ -257,8 +260,8 @@ class DynamicObstacle(Obstacle):
 **************************************************************************************************************************************************************************
 '''
 class Character(DynamicObstacle):
-	def __init__(self, x, y, program_data):
-		super().__init__(x, y, program_data)
+	def __init__(self, x, y):
+		super().__init__(x, y)
 
 	def blitme(self):
 		self.rect.x = self.x
@@ -268,13 +271,13 @@ class Character(DynamicObstacle):
 
 		self.image_x = self.x 
 		#offset the y so the image of the player stands closer to the middle of the tile
-		self.image_y = self.y - self.program_data.tile_size + 10
+		self.image_y = self.y - self.tile_size + 10
 		self.screen.display.blit(self.image, (self.image_x, self.image_y))
 
 	def finish_animation(self):
 		#Finish the animation for all movements. Only run after a keyup ends the player movement. Also handles finishing animation after a collision.
-		self.x_round = self.program_data.tile_size * round(self.x / self.program_data.tile_size)
-		self.y_round = self.program_data.tile_size * round(self.y / self.program_data.tile_size)
+		self.x_round = self.tile_size * round(self.x / self.tile_size)
+		self.y_round = self.tile_size * round(self.y / self.tile_size)
 		if self.direction == "right" or self.direction == "left":
 			if abs(self.x - self.x_round) <= self.speed:
 				self.x = self.x_round

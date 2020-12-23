@@ -1,7 +1,8 @@
 import pygame
 import time
 from pygame.sprite import Sprite
-import audio_mixer as am
+from program_variables import settings
+
 
 class DummyBox(Sprite):
 	'''class to always populate the display_box group, to allow it to update properly'''
@@ -17,13 +18,12 @@ class DummyBox(Sprite):
 
 class DisplayBox(Sprite):
 	'''class to define the display box at the bottom of the screen'''
-	def __init__(self, program_data):
+	def __init__(self):
 		super(DisplayBox, self).__init__()
-		self.program_data = program_data
-		self.screen = self.program_data.screen
-		self.audio_mixer = self.program_data.audio_mixer
+		self.screen = settings.screen
+		self.tile_size = settings.tile_size
 		
-		#font_main program_data
+		#font_main pd
 		self.text_color = (4,65,33)
 		self.font_main = pygame.font.SysFont('Calibri', 20)
 		self.font_sub = pygame.font.SysFont('Calibri', 18)
@@ -34,18 +34,18 @@ class DisplayBox(Sprite):
 
 		#Default display box locations
 		self.width = self.screen.rect.width
-		self.height = self.program_data.tile_size*3
+		self.height = self.tile_size*3
 		self.left = self.screen.rect.left
 		self.top = self.screen.rect.bottom - self.height
 		self.rect = pygame.Rect(self.left, self.top, self.width, self.height)
 
 		self.response_width = self.screen.rect.width/2
-		self.response_height = self.program_data.tile_size*2
+		self.response_height = self.tile_size*2
 		self.response_left = self.screen.rect.right - self.response_width
-		self.response_top = self.screen.rect.bottom - self.program_data.tile_size*5
+		self.response_top = self.screen.rect.bottom - self.tile_size*5
 
 		self.rect_response = pygame.Rect(self.response_left , self.response_top, self.response_width, self.response_height)
-		self.rect_scrollbar = pygame.Rect(self.screen.rect.width - 14, self.response_top + 6, round(self.program_data.tile_size/3) + 4 , self.response_height - 12)
+		self.rect_scrollbar = pygame.Rect(self.screen.rect.width - 14, self.response_top + 6, round(self.tile_size/3) + 4 , self.response_height - 12)
 		
 		self.arrow_value_x = 0
 		self.arrow_value_y = 0
@@ -152,8 +152,7 @@ class DisplayBox(Sprite):
 					self.blit_response_options()
 					self.blit_select_arrow()
 					self.noise_on = True
-					self.audio_mixer.audio_key = ('sound_display_box')
-					self.audio_mixer.load_sound()
+
 					
 					if self.arrow_value_y <= 1:
 						self.response_line = self.arrow_value_y = 1
@@ -168,7 +167,7 @@ class DisplayBox(Sprite):
 				self.is_active = False
 			#Trigger battle sequence for battlers
 			if self.message_type == "battle":
-				self.program_data.game_state = "battle"
+				pd.game_state = "battle"
 		self.blit_lines()
 
 	def fill_line1(self):
@@ -249,8 +248,6 @@ class DisplayBox(Sprite):
 		if not self.typing and self.main_message_done == False:
 			self.blit_next_arrow()	
 			self.noise_on = True
-			self.audio_mixer.audio_key = 'sound_display_box'
-			self.audio_mixer.load_sound()
 
 	def blit_next_arrow(self):
 		self.arrow_images = [pygame.image.load('.\\Images\\Misc\\down_arrow.png'), pygame.image.load('.\\Images\\Misc\\down_arrow.png'), pygame.image.load('.\\Images\\Misc\\down_arrow2.png')]
@@ -290,7 +287,7 @@ class DisplayBox(Sprite):
 		pygame.draw.rect(self.screen.display, self.color, self.rect)
 
 	def blit_response_scrollbar(self):
-		self.rect_scrollbar_inside = pygame.Rect(self.screen.rect.width - 11, self.response_top + 10, self.program_data.tile_size/4 + 1, self.response_height - 50)
+		self.rect_scrollbar_inside = pygame.Rect(self.screen.rect.width - 11, self.response_top + 10, self.tile_size/4 + 1, self.response_height - 50)
 		pygame.draw.rect(self.screen.display, self.color_scrollbar, self.rect_scrollbar)
 		pygame.draw.rect(self.screen.display, self.color_scrollbar_inside, self.rect_scrollbar_inside)
 
@@ -309,6 +306,6 @@ class DisplayBox(Sprite):
 
 class Scrollbox(DisplayBox):
 	'''class to define the display box at the bottom of the screen'''
-	def __init__(self, program_data, screen, audio_mixer):
-		super().__init__(program_data, screen, audio_mixer)
+	def __init__(self):
+		super().__init__()
 
